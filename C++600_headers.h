@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+
+#define T_TYPEDEF     100
+#define T_CHAR        101
+#define T_INT         102
+#define T_FLOAT       103
+#define T_STRING      104
+#define T_CLASS       105
+#define T_PRIVATE     106
+#define T_PROTECTED   107
+#define T_PUBLIC      108
+#define T_VOID        109
+#define T_STATIC      110
+#define T_UNION       111
+#define T_ENUM        112
+#define T_LIST        113
+#define T_CONTINUE    114
+#define T_BREAK       115
+#define T_IF          116
+#define T_ELSE        117
+#define T_WHILE       118
+#define T_FOR         119
+#define T_SWITCH      120
+#define T_CASE        121
+#define T_DEFAULT     122
+#define T_RETURN      123
+#define T_LENGTH      124
+#define T_NEW         125
+#define T_CIN         126
+#define T_COUT        127
+#define T_MAIN        128
+#define T_THIS        129
+#define T_CCONST      130
+#define T_SCONST      131
+#define T_ICONST      132
+#define T_FCONST      133
+#define T_OROP        134
+#define T_ANDOP       135
+#define T_EQUOP       136
+#define T_RELOP       137
+#define T_ADDOP       138
+#define T_MULOP       139
+#define T_NOTOP       140
+#define T_INCDEC      141
+#define T_SIZEOP      142
+#define T_LPAREN      143
+#define T_RPAREN      144
+#define T_SEMI        145
+#define T_DOT         146
+#define T_COMMA       147
+#define T_ASSIGN      148
+#define T_COLON       149
+#define T_LBRACK      150
+#define T_RBRACK      151
+#define T_REFER       152
+#define T_LBRACE      153
+#define T_METH        154
+#define T_INP         155
+#define T_OUT         156
+#define T_EOF         157
