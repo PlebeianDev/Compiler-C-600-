@@ -4,9 +4,11 @@
 #include "C++600_headers.h"
 %}
 
-digit                       [0-9]
-letter                      [a-zA-Z]
-alnum                       [a-zA-Z0-9]
+%option case-insensitive
+
+digit                                                                           [0-9]
+letter                                                                          [a-zA-Z]
+alnum                                                                           [a-zA-Z0-9]
 
 /* Rules Section */
 
@@ -15,6 +17,7 @@ alnum                       [a-zA-Z0-9]
 */
 
 %%
+ /* Key Words */;
 "typedef"                                                                       {printf("TOKEN TYPEDEF: %s\n", yytext);}
 "char"                                                                          {printf("TOKEN CHAR: %s\n", yytext);}
 "int"                                                                           {printf("TOKEN INT: %s\n", yytext);}
@@ -46,12 +49,26 @@ alnum                       [a-zA-Z0-9]
 "main"                                                                          {printf("TOKEN MAIN: %s\n", yytext);}
 "this"                                                                          {printf("TOKEN THIS: %s\n", yytext);}
 
-
+ /* IDENTIFIER */;
 \_?\_?{letter}+(\_{1}?{alnum}|{alnum})*\_?                                      {printf("TOKEN ID: %s\n", yytext);}
+
+ /* DATA TYPES */;
 {digit}+                                                                        {printf("TOKEN INT: %s\n", yytext);}
-\'{letter}\'                                                                    {printf("TOKEN CHAR: %s\n", yytext);} /* Ask if we need %,$...*/
+  /* Ask if we need %,$...*/;
+\'{letter}\'                                                                    {printf("TOKEN CHAR: %s\n", yytext);}
 {digit}+\.{digit}+                                                              {printf("TOKEN FLOAT: %s\n", yytext);}
 \"{letter}+\"                                                                   {printf("TOKEN STRING: %s\n", yytext);}
+
+ /* OPERATORS */;
+\|{2}                                                                           {printf("TOKEN OROP: %s\n", yytext);}
+\&{2}                                                                           {printf("TOKEN ANDOP: %s\n", yytext);}
+\={2}|\!\=                                                                      {printf("TOKEN EQUOP: %s\n", yytext);}
+\>|\>\=|\<|\<\=                                                                 {printf("TOKEN RELOP: %s\n", yytext);}
+\+|\-                                                                           {printf("TOKEN ADDOP: %s\n" yytext);}
+\*|\/|\%                                                                        {printf("TOKEN MULOP: %s\n" yytext);}
+\!                                                                              {printf("TOKEN NOTOP: %s\n" yytext);}
+\+{2}|\-{2}                                                                     {printf("TOKEN INCDEC: %s\n" yytext);}
+"SIZEOF"                                                                        {printf("TOKEN SIZEOF: %s\n" yytext);}
 %%
 
 int main(){
