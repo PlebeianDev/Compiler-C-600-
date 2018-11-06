@@ -65,3 +65,10 @@
 #define T_OUT         56
 #define T_EOF         -1
 #define T_ID          57
+
+#define YYTYPE_IS_DECLARED
+typedef union{
+	const char* strval;
+	int ival;
+	double dval;
+}YYSTYPE;
