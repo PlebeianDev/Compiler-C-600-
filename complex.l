@@ -2,6 +2,9 @@
 
 %{
 #include "C++600_headers.h"
+
+int tokencount = 0;
+int linecount = 1;
 %}
 
 %option case-insensitive
@@ -14,61 +17,66 @@ alnum                                                                           
 
 /*
     add error handling wherever needed
+    add the while...eof... return should not stop
+    
 */
 
 %%
  /* Key Words */;
-"typedef"                                                                       {printf("TOKEN TYPEDEF: %s\n", yytext);}
-"char"                                                                          {printf("TOKEN CHAR: %s\n", yytext);}
-"int"                                                                           {printf("TOKEN INT: %s\n", yytext);}
-"float"                                                                         {printf("TOKEN FLOAT: %s\n", yytext);}
-"str"                                                                           {printf("TOKEN STRING: %s\n", yytext);}
-"class"                                                                         {printf("TOKEN CLASS: %s\n", yytext);}
-"private"                                                                       {printf("TOKEN PRIVATE: %s\n", yytext);}
-"protected"                                                                     {printf("TOKEN PROTECTED: %s\n", yytext);}
-"public"                                                                        {printf("TOKEN PUBLIC: %s\n", yytext);}
-"void"                                                                          {printf("TOKEN VOID: %s\n", yytext);}
-"static"                                                                        {printf("TOKEN STATIC: %s\n", yytext);}
-"union"                                                                         {printf("TOKEN UNION: %s\n", yytext);}
-"enum"                                                                          {printf("TOKEN ENUM: %s\n", yytext);}
-"list"                                                                          {printf("TOKEN LIST: %s\n", yytext);}
-"continue"                                                                      {printf("TOKEN CONTINUE: %s\n", yytext);}
-"break"                                                                         {printf("TOKEN BREAK: %s\n", yytext);}
-"if"                                                                            {printf("TOKEN IF: %s\n", yytext);}
-"else"                                                                          {printf("TOKEN ELSE: %s\n", yytext);}
-"while"                                                                         {printf("TOKEN WHILE: %s\n", yytext);}
-"for"                                                                           {printf("TOKEN FOR: %s\n", yytext);}
-"switch"                                                                        {printf("TOKEN SWITCH: %s\n", yytext);}
-"case"                                                                          {printf("TOKEN CASE: %s\n", yytext);}
-"default"                                                                       {printf("TOKEN DEFAULT: %s\n", yytext);}
-"return"                                                                        {printf("TOKEN RETURN: %s\n", yytext);}
-"length"                                                                        {printf("TOKEN LENGTH: %s\n", yytext);}
-"new"                                                                           {printf("TOKEN NEW: %s\n", yytext);}
-"cin"                                                                           {printf("TOKEN CIN: %s\n", yytext);}
-"cout"                                                                          {printf("TOKEN COUT: %s\n", yytext);}
-"main"                                                                          {printf("TOKEN MAIN: %s\n", yytext);}
-"this"                                                                          {printf("TOKEN THIS: %s\n", yytext);}
+"typedef"                                                                       {++tokencount; printf("Line %d --> TOKEN TYPEDEF: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"char"                                                                          {++tokencount; printf("Line %d --> TOKEN CHAR: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"int"                                                                           {++tokencount; printf("Line %d --> TOKEN INT: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"float"                                                                         {++tokencount; printf("Line %d --> TOKEN FLOAT: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"str"                                                                           {++tokencount; printf("Line %d --> TOKEN STRING: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"class"                                                                         {++tokencount; printf("Line %d --> TOKEN CLASS: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"private"                                                                       {++tokencount; printf("Line %d --> TOKEN PRIVATE: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"protected"                                                                     {++tokencount; printf("Line %d --> TOKEN PROTECTED: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"public"                                                                        {++tokencount; printf("Line %d --> TOKEN PUBLIC: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"void"                                                                          {++tokencount; printf("Line %d --> TOKEN VOID: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"static"                                                                        {++tokencount; printf("Line %d --> TOKEN STATIC: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"union"                                                                         {++tokencount; printf("Line %d --> TOKEN UNION: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"enum"                                                                          {++tokencount; printf("Line %d --> TOKEN ENUM: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"list"                                                                          {++tokencount; printf("Line %d --> TOKEN LIST: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"continue"                                                                      {++tokencount; printf("Line %d --> TOKEN CONTINUE: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"break"                                                                         {++tokencount; printf("Line %d --> TOKEN BREAK: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"if"                                                                            {++tokencount; printf("Line %d --> TOKEN IF: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"else"                                                                          {++tokencount; printf("Line %d --> TOKEN ELSE: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"while"                                                                         {++tokencount; printf("Line %d --> TOKEN WHILE: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"for"                                                                           {++tokencount; printf("Line %d --> TOKEN FOR: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"switch"                                                                        {++tokencount; printf("Line %d --> TOKEN SWITCH: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"case"                                                                          {++tokencount; printf("Line %d --> TOKEN CASE: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"default"                                                                       {++tokencount; printf("Line %d --> TOKEN DEFAULT: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"return"                                                                        {++tokencount; printf("Line %d --> TOKEN RETURN: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"length"                                                                        {++tokencount; printf("Line %d --> TOKEN LENGTH: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"new"                                                                           {++tokencount; printf("Line %d --> TOKEN NEW: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"cin"                                                                           {++tokencount; printf("Line %d --> TOKEN CIN: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"cout"                                                                          {++tokencount; printf("Line %d --> TOKEN COUT: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"main"                                                                          {++tokencount; printf("Line %d --> TOKEN MAIN: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"this"                                                                          {++tokencount; printf("Line %d --> TOKEN THIS: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
 
  /* IDENTIFIER */;
-\_?\_?{letter}+(\_{1}?{alnum}|{alnum})*\_?                                      {printf("TOKEN ID: %s\n", yytext);}
+\_*{letter}+(\_{1}?{alnum}|{alnum})*\_?                                         {++tokencount; printf("Line %d --> TOKEN ID: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+\n																				{++linecount;}
+.                                                                               {}
 
  /* DATA TYPES */;
-{digit}+                                                                        {printf("TOKEN INT: %s\n", yytext);}
+ /* put atoi return in print*/
+{digit}+                                                                        {++tokencount; printf("Line %d --> TOKEN ID: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
   /* Ask if we need %,$...*/;
-\'{letter}\'                                                                    {printf("TOKEN CHAR: %s\n", yytext);}
-{digit}+\.{digit}+                                                              {printf("TOKEN FLOAT: %s\n", yytext);}
-\"{letter}+\"                                                                   {printf("TOKEN STRING: %s\n", yytext);}
+\'{letter}\'                                                                    {++tokencount; printf("Line %d --> TOKEN INT: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+{digit}+\.{digit}+                                                              {++tokencount; printf("Line %d --> TOKEN FLOAT: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+\"{letter}+\"                                                                   {++tokencount; printf("Line %d --> TOKEN STRING: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
 
  /* OPERATORS */;
-\|{2}                                                                           {printf("TOKEN OROP: %s\n", yytext);}
-\&{2}                                                                           {printf("TOKEN ANDOP: %s\n", yytext);}
-\={2}|\!\=                                                                      {printf("TOKEN EQUOP: %s\n", yytext);}
-\>|\>\=|\<|\<\=                                                                 {printf("TOKEN RELOP: %s\n", yytext);}
-\+|\-                                                                           {printf("TOKEN ADDOP: %s\n" yytext);}
-\*|\/|\%                                                                        {printf("TOKEN MULOP: %s\n" yytext);}
-\!                                                                              {printf("TOKEN NOTOP: %s\n" yytext);}
-\+{2}|\-{2}                                                                     {printf("TOKEN INCDEC: %s\n" yytext);}
-"SIZEOF"                                                                        {printf("TOKEN SIZEOF: %s\n" yytext);}
+"||"                                                                            {++tokencount; printf("Line %d --> TOKEN OROP: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"&&"                                                                            {++tokencount; printf("Line %d --> TOKEN ANDOP: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"=="|"!="                                                                       {++tokencount; printf("Line %d --> TOKEN EQUOP: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+">"|">="|"<"|"<="                                                               {++tokencount; printf("Line %d --> TOKEN RELOP: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"+"|"-"                                                                         {++tokencount; printf("Line %d --> TOKEN ADDOP: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"*"|"/"|"%"                                                                     {++tokencount; printf("Line %d --> TOKEN MULOP: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"!"                                                                             {++tokencount; printf("Line %d --> TOKEN NOTOP: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"++"|"--"                                                                       {++tokencount; printf("Line %d --> TOKEN INCDEC: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"SIZEOF"                                                                        {++tokencount; printf("Line %d --> TOKEN SIZEOF: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
 %%
 
 int main(){
