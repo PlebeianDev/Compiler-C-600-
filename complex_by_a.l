@@ -13,6 +13,7 @@ digit                       [0-9]
 letter                      [a-zA-Z]
 alnum                       [a-zA-Z0-9]
 hex							[a-fA-F0-9]
+oct							[0-7]
 bin							[0-1]
 
 %x COMMENTS
@@ -69,10 +70,12 @@ bin							[0-1]
 {digit}+                                                                        {++tokencount; printf("Line %d --> ICONST: %s | TOKEN #%d\n", linecount, yytext, tokencount); yylval.ival = dectoInt(yytext);return(T_ICONST);}
 \'{letter}\'                                                                    {++tokencount; printf("Line %d --> CCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount); yylval.strval = yytext;return(T_CCONST);} /* Ask if we need %,$...*/
 {digit}+\.{digit}+                                                              {++tokencount; printf("Line %d --> FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount); yylval.dval = dectoReal(yytext);return(T_FCONST);}
-(0B){bin}+																		{++tokencount; printf("Line %d --> Bin_ICONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.ival = bintoInt(yytext);return(T_ICONST);}
-0[xX]{hex}+																		{++tokencount; printf("Line %d --> Hex_ICONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(hextoInt(yytext));}
+0(b|B)1?{bin}+																	{++tokencount; printf("Line %d --> Bin_ICONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.ival = bintoInt(yytext);return(T_ICONST);}
+0(o|O)[1-7]{oct}+
+0(x|X)[a-fA-F1-9]{hex}+																	{++tokencount; printf("Line %d --> Hex_ICONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(hextoInt(yytext));}
 {bin}+\.{bin}+																	{++tokencount; printf("Line %d --> Bin_FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(bintoReal(yytext));}
 {hex}+\.{hex}+																	{++tokencount; printf("Line %d --> Hex_FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(hextoReal(yytext));}
+{oct}+\.{oct}+
 \"{letter}+\"                                                                   {++tokencount; printf("Line %d --> TOKEN STRING: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
 
 /**	The strings by using the state method. Based on dimbot's Instructions
