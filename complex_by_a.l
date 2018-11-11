@@ -16,8 +16,8 @@ hex							[a-fA-F0-9]
 oct							[0-7]
 bin							[0-1]
 
-%x COMMENTS
-%x STRINGS
+%x COMMENT
+%x STRING
 /* Rules Section */
 
 /*
@@ -171,12 +171,12 @@ double bintoReal(char *s){
 int yywrap(){return(58);}
 int yymore(){};
 int main(int argc, char *args[]){
-    
+
 	if(argc > 1)
 		yyin = fopen(args[1], "r");
 	else
 		yyin = stdin;
-	
+
     while(yylex() != T_EOF){}
 	printf("Read %d Lines\n", linecount);
 	printf("Recognized %d Lectical Units\n", tokencount);

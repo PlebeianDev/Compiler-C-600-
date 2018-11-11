@@ -12,12 +12,20 @@ int linecount = 1;
 digit                                                                           [0-9]
 letter                                                                          [a-zA-Z]
 alnum                                                                           [a-zA-Z0-9]
+hex                                                                             [a-fA-F0-9]
+bin                                                                             [0-1]
+
+%x LINE_COMMENT
+%x COMMENT
+%x STRING
 
 /* Rules Section */
 
 /*
     add error handling wherever needed
     add the while...eof... return should not stop
+    RETURN THE CODES
+    PUT EOF SOMEHERE
 
 */
 
@@ -75,6 +83,38 @@ alnum                                                                           
 "+"|"-"                                                                         {++tokencount; printf("Line %d --> TOKEN ADDOP: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
 "*"|"/"|"%"                                                                     {++tokencount; printf("Line %d --> TOKEN MULOP: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
 "!"                                                                             {++tokencount; printf("Line %d --> TOKEN NOTOP: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+
+ /* Other char-Tokens*/;
+"("                                                                             {++tokencount; printf("Line %d --> TOKEN LPAREN: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+")"                                                                             {++tokencount; printf("Line %d --> TOKEN RPAREN: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+";"                                                                             {++tokencount; printf("Line %d --> TOKEN SEMI: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"."                                                                             {++tokencount; printf("Line %d --> TOKEN COLON: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+","                                                                             {++tokencount; printf("Line %d --> TOKEN COMMA: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"="                                                                             {++tokencount; printf("Line %d --> TOKEN ASSIGN: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"::"                                                                            {++tokencount; printf("Line %d --> TOKEN METH: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+":"                                                                             {++tokencount; printf("Line %d --> TOKEN COLON: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"["                                                                             {++tokencount; printf("Line %d --> TOKEN LBRACK: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"]"                                                                             {++tokencount; printf("Line %d --> TOKEN RBRACK: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"{"                                                                             {++tokencount; printf("Line %d --> TOKEN LBRACE: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"}"                                                                             {++tokencount; printf("Line %d --> TOKEN RBRACE: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"&"                                                                             {++tokencount; printf("Line %d --> TOKEN REFER: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+">>"                                                                            {++tokencount; printf("Line %d --> TOKEN INP: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"<<"                                                                            {++tokencount; printf("Line %d --> TOKEN OUT: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+
+ /* Comments */;
+
+ /*WRONG DOES NOT CATCH COMMENT IN DIFF LINES*/;
+"/*"                                                                            {BEGIN(COMMENT);}
+<COMMENT>"*/"                                                                   {BEGIN(INITIAL);}
+<COMMENT>"\n"                                                                   {++linecount;}
+<COMMENT>.                                                                      {}
+<COMMENT><<EOF>>                                                                {printf("COMMENT ERROR");}
+
+ /* WRONG DO IT AGAIN*/;
+"//"                                                                            {BEGIN(LINE_COMMENT);}
+<LINE_COMMENT>"\n"                                                              {BEGIN(INITIAL); ++linecount;}
+<LINE_COMMENT><<EOF>>                                                           {printf("LINE COMMENT ERROR");}
+
 
 \n																				                                      {++linecount;}
 .
