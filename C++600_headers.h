@@ -72,3 +72,13 @@ typedef union{
 	int ival;
 	double dval;
 }YYSTYPE;
+
+void yyerror (char const *s);
+int dectoInt(char *s);
+int hextoInt(char *s);
+int octtoInt(char *s);
+int bintoInt(char *s);
+double dectoReal(char *s);
+double hextoReal(char *s);
+double octtoReal(char *s);
+double bintoReal(char *s);
