@@ -3,8 +3,11 @@
 %{
 #include "C++600_headers.h"
 
+void yyerror (char const *s);
+
 int tokencount = 0;
 int linecount = 1;
+
 %}
 
 %option case-insensitive
@@ -14,6 +17,8 @@ letter                                                                          
 alnum                                                                           [a-zA-Z0-9]
 hex                                                                             [a-fA-F0-9]
 bin                                                                             [0-1]
+ascii                                                                           [ !"#$%&'()*+,-./:;<=>?@\[\\\]^_`{|}~]
+whitespace                                                                      [ \t]
 
 %x LINE_COMMENT
 %x COMMENT
@@ -101,9 +106,18 @@ bin                                                                             
 ">>"                                                                            {++tokencount; printf("Line %d --> TOKEN INP: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
 "<<"                                                                            {++tokencount; printf("Line %d --> TOKEN OUT: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
 
+ /* CCONST */;
+\'\\n\'                                                                         {++tokencount; printf("Line %d --> TOKEN CCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+\'\\f\'                                                                         {++tokencount; printf("Line %d --> TOKEN CCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+\'\\t\'                                                                         {++tokencount; printf("Line %d --> TOKEN CCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+\'\\r\'                                                                         {++tokencount; printf("Line %d --> TOKEN CCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+\'\\b\'                                                                         {++tokencount; printf("Line %d --> TOKEN CCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+\'\\v\'                                                                         {++tokencount; printf("Line %d --> TOKEN CCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+\'{ascii}\'|\'{alnum}\'                                                         {++tokencount; printf("Line %d --> TOKEN CCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+
+
  /* Comments */;
 
- /*WRONG DOES NOT CATCH COMMENT IN DIFF LINES*/;
 "/*"                                                                            {BEGIN(COMMENT);}
 <COMMENT>"*/"                                                                   {BEGIN(INITIAL);}
 <COMMENT>"\n"                                                                   {++linecount;}
@@ -112,21 +126,36 @@ bin                                                                             
 
  /* WRONG DO IT AGAIN*/;
 "//"                                                                            {BEGIN(LINE_COMMENT);}
-<LINE_COMMENT>"\n"                                                              {BEGIN(INITIAL); ++linecount;}
+<LINE_COMMENT>"\n"                                                              {++linecount; BEGIN(INITIAL);}
 <LINE_COMMENT><<EOF>>                                                           {printf("LINE COMMENT ERROR");}
 
 
-\n																				                                      {++linecount;}
-.
+<<EOF>>																			{return(T_EOF);}
+{whitespace}                                                                    {}
+\n																				{++linecount;}
+.                                                                               {}
 %%
 
-int main(){
-    FILE *fp;
+/* void yyerror (char const *s){
+	errorcount++;
+	printf("%d errors found with %s at token %s in line %d\n", errorcount, s, yytext, linecount);
+	if(MAX_ERRORS == error_count){
+		fprintf (stderr, "MAX ERRORS OCCURED!\n", s);
+		exit(-1);
+	}
+} */
 
-    fp = fopen("test.txt", "r");
-    yyin = fp;
+int main(int argc, char *args[]){
+  if(argc > 1){
+      yyin = fopen(args[1], "r");
+  }
+  else{
+      yyin = stdin;
+  }
 
-    yylex();
-    return 0;
+  while(yylex() != T_EOF){}
+  printf("Read %d Lines\n", linecount);
+  printf("Recognized %d Lectical Units\n", tokencount);
+  return 0;
 }
 int yywrap(){}
