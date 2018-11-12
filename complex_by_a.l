@@ -2,10 +2,15 @@
 
 %{
 #include "C++600_headers.h"
-#define T_LISTFUNC 900
+
+void yyerror (char const *s);
+
 int tokencount = 0;
 int linecount = 1;
-YYSTYPE yylval;
+
+char buffer[STR_BUF];
+char* buffer_ptr;
+
 %}
 
 %option case-insensitive
@@ -15,9 +20,8 @@ letter                                                                          
 alnum                                                                           [a-zA-Z0-9]
 hex                                                                             [a-fA-F0-9]
 bin                                                                             [0-1]
-oct																				[0-7]
 ascii                                                                           [ !"#$%&'()*+,-./:;<=>?@\[\\\]^_`{|}~]
-whitespace                                                                      [ \t]+
+whitespace                                                                      [ \t]
 
 %x LINE_COMMENT
 %x COMMENT
@@ -26,7 +30,9 @@ whitespace                                                                      
 /* Rules Section */
 
 /*
-    add error handling wherever needed
+    RETURN THE CODES
+    FIX yyerror
+    ADD act codes and funcs
 */
 
 %%
@@ -89,9 +95,18 @@ whitespace                                                                      
 ([1-9]{digit}*)?[.]((0*[1-9]+{digit}*)|0)([E]([+-]?)(([1-9]{digit}*)|0))?		{++tokencount; printf("Line %d --> EXP_FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_FCONST);}
 0|[1-9]{digit}*([E]([+-]?)(([1-9]{digit}*)|0))?									{++tokencount; printf("Line %d --> EXP_FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_FCONST);}
 
+ /* CCONST */;
+\'\\n\'                                                                         {++tokencount; printf("Line %d --> TOKEN CCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+\'\\f\'                                                                         {++tokencount; printf("Line %d --> TOKEN CCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+\'\\t\'                                                                         {++tokencount; printf("Line %d --> TOKEN CCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+\'\\r\'                                                                         {++tokencount; printf("Line %d --> TOKEN CCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+\'\\b\'                                                                         {++tokencount; printf("Line %d --> TOKEN CCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+\'\\v\'                                                                         {++tokencount; printf("Line %d --> TOKEN CCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+\'{ascii}\'|\'{alnum}\'                                                         {++tokencount; printf("Line %d --> TOKEN CCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+
  /* OPERATORS */;
-"||"                                                                            {++tokencount; printf("Line %d --> TOKEN OROP: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_OROP);}
-"&&"                                                                            {++tokencount; printf("Line %d --> TOKEN ANDOP: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_ANDOP);}
+"||"                                                                            {++tokencount; printf("Line %d --> TOKEN OROP: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+"&&"                                                                            {++tokencount; printf("Line %d --> TOKEN ANDOP: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
 "=="|"!="                                                                       {++tokencount; printf("Line %d --> TOKEN EQUOP: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
 ">="|"<="|">"|"<"                                                               {++tokencount; printf("Line %d --> TOKEN RELOP: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
 "++"|"--"                                                                       {++tokencount; printf("Line %d --> TOKEN INCDEC: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
@@ -102,7 +117,7 @@ whitespace                                                                      
  /* Other char-Tokens*/;
 "("                                                                             {++tokencount; printf("Line %d --> TOKEN LPAREN: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
 ")"                                                                             {++tokencount; printf("Line %d --> TOKEN RPAREN: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
-";"                                                                             {++tokencount; printf("Line %d --> TOKEN SEMI: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_SEMI);}
+";"                                                                             {++tokencount; printf("Line %d --> TOKEN SEMI: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
 "."                                                                             {++tokencount; printf("Line %d --> TOKEN COLON: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
 ","                                                                             {++tokencount; printf("Line %d --> TOKEN COMMA: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
 "="                                                                             {++tokencount; printf("Line %d --> TOKEN ASSIGN: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
@@ -116,30 +131,31 @@ whitespace                                                                      
 ">>"                                                                            {++tokencount; printf("Line %d --> TOKEN INP: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
 "<<"                                                                            {++tokencount; printf("Line %d --> TOKEN OUT: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
 
- /* CCONST */;
-\'\\n\'                                                                         {++tokencount; printf("Line %d --> TOKEN CCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
-\'\\f\'                                                                         {++tokencount; printf("Line %d --> TOKEN CCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
-\'\\t\'                                                                         {++tokencount; printf("Line %d --> TOKEN CCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
-\'\\r\'                                                                         {++tokencount; printf("Line %d --> TOKEN CCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
-\'\\b\'                                                                         {++tokencount; printf("Line %d --> TOKEN CCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
-\'\\v\'                                                                         {++tokencount; printf("Line %d --> TOKEN CCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
-\'{ascii}\'|\'{alnum}\'                                                         {++tokencount; printf("Line %d --> TOKEN CCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
-
-
- /* Multiple line Comments */;
-
+ /* Comments */;
 "/*"                                                                            {BEGIN(COMMENT);}
 <COMMENT>"*/"                                                                   {BEGIN(INITIAL);}
 <COMMENT>"\n"                                                                   {++linecount;}
 <COMMENT>.                                                                      {}
-<COMMENT><<EOF>>                                                                {yyerror("Premature End of File");yyterminate();}
+<COMMENT><<EOF>>                                                                {printf("COMMENT ERROR");}
 
- /*single line comments */
 "//"                                                                            {BEGIN(LINE_COMMENT);}
 <LINE_COMMENT>"\n"                                                              {++linecount; BEGIN(INITIAL);}
 <LINE_COMMENT>.																	{}
-<LINE_COMMENT><<EOF>>                                                           {yyerror("Premature End of File");yyterminate();}
+<LINE_COMMENT><<EOF>>                                                           {printf("LINE COMMENT ERROR");}
 
+ /* SCONST */;
+\"                                                                              {buffer_ptr = buffer; BEGIN(STRING);}
+<STRING>\"                                                                      {*buffer_ptr = '\0'; BEGIN(INITIAL); {++tokencount; printf("Line %d --> TOKEN STRING: %s | TOKEN #%d\n", linecount, yytext, tokencount);}}
+<STRING>\n                                                                      {/* yyerror */}
+<STRING>\\n                                                                     {*buffer_ptr++; *buffer_ptr = '\n';}
+<STRING>\\f                                                                     {*buffer_ptr++; *buffer_ptr = '\f';}
+<STRING>\\t                                                                     {*buffer_ptr++; *buffer_ptr = '\t';}
+<STRING>\\r                                                                     {*buffer_ptr++; *buffer_ptr = '\r';}
+<STRING>\\b                                                                     {*buffer_ptr++; *buffer_ptr = '\b';}
+<STRING>\\v                                                                     {*buffer_ptr++; *buffer_ptr = '\v';}
+<STRING>\\\n                                                                    {++linecount;}
+<STRING>\\
+<STRING><<EOF>>                                                                 {/* yyerror */}
 
 <<EOF>>										                                    {return(T_EOF);}
 {whitespace}                                                                    {}
