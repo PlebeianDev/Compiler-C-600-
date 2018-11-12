@@ -2,7 +2,7 @@
 
 %{
 #include "C++600_headers.h"
-
+#define T_LISTFUNC 900
 int tokencount = 0;
 int linecount = 1;
 YYSTYPE yylval;
@@ -63,6 +63,9 @@ whitespace                                                                      
 "this"                                                                          {++tokencount; printf("Line %d --> TOKEN THIS: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_THIS);}
 "sizeof"                                                                        {++tokencount; printf("Line %d --> TOKEN SIZEOF: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_SIZEOP);}
 
+ /* list func */
+[C](([A][D]*)|([D]+))[R]														{++tokencount; printf("Line %d --> LISTFUNC: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_LISTFUNC);}
+
  /* IDENTIFIER */;
 \_*{letter}+(\_{1}?{alnum}|{alnum})*\_?                                         {++tokencount; printf("Line %d --> TOKEN ID: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_ID);}
 
@@ -99,7 +102,7 @@ whitespace                                                                      
  /* Other char-Tokens*/;
 "("                                                                             {++tokencount; printf("Line %d --> TOKEN LPAREN: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
 ")"                                                                             {++tokencount; printf("Line %d --> TOKEN RPAREN: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
-";"                                                                             {++tokencount; printf("Line %d --> TOKEN SEMI: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
+";"                                                                             {++tokencount; printf("Line %d --> TOKEN SEMI: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_SEMI);}
 "."                                                                             {++tokencount; printf("Line %d --> TOKEN COLON: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
 ","                                                                             {++tokencount; printf("Line %d --> TOKEN COMMA: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
 "="                                                                             {++tokencount; printf("Line %d --> TOKEN ASSIGN: %s | TOKEN #%d\n", linecount, yytext, tokencount);}
@@ -141,7 +144,7 @@ whitespace                                                                      
 <<EOF>>										                                    {return(T_EOF);}
 {whitespace}                                                                    {}
 \n										                                        {++linecount;}
-.                                                                               {yyerror("Invalid Unit");yyterminate();}
+.                                                                               {++tokencount;printf("Line %d --> %s TOKEN #%d\n", linecount, yytext, tokencount);yyerror("Invalid Unit");yyterminate();}
 %%
 
 void yyerror (char const *s){
@@ -159,6 +162,13 @@ int hextoInt(char *s){
 	res = (int)strtol(&s[2], NULL, 16);
 	return res;
 }
+
+int octtoInt(char *s){
+	int res;
+	res = (int)strtol(&s[2], NULL, 8);
+	return res;
+}
+
 
 int bintoInt(char *s){
 	int res;
@@ -180,7 +190,20 @@ double hextoReal(char *s){
 	len_r = strlen(character) - 1;
 	res = (int)strtol(&s[2], &character, 16);
 	for(i = 0; i <= len_r; i++){
-		res = (character[i]-'0')*(1/pow(2,i)) + res;
+		res = (character[i]-'0')*(1/pow(16,i)) + res;
+	}
+	return res;
+}
+
+double octtoReal(char *s){
+	double res;
+	int len_r, i;
+	char *character;
+	character = strchr(s, '.');
+	len_r = strlen(character) - 1;
+	res = (int)strtol(&s[2], &character, 8);
+	for(i = 0; i <= len_r; i++){
+		res = (character[i]-'0')*(1/pow(8,i)) + res;
 	}
 	return res;
 }
