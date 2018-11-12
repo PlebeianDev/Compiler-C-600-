@@ -66,6 +66,8 @@
 #define T_OUT         57
 #define T_ID          58
 
+#define STR_BUF		  256
+
 #define YYTYPE_IS_DECLARED
 typedef union{
 	const char* strval;
