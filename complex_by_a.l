@@ -78,11 +78,8 @@ whitespace                                                                      
  /* DATA TYPES */;
  /* Floating point */
 0(x|X)([a-fA-F1-9]{hex}*)?[.]((0*[a-fA-F1-9]+{hex}*)|0)							{++tokencount; printf("Line %d --> Hex_FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.dval = hextoReal(yytext);printf("TOKEN literal value: %.2lf\n", hextoReal(yytext));return(T_FCONST);}
-
 0(o|O)([1-7]{oct}*)?[.]((0*[1-7]+{oct}*)|0)										{++tokencount; printf("Lice %d --> Oct_FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);/*yylval.dval = octtoReal(yytext);*/return(T_FCONST);}
-
 0(b|B)(1{bin}*)?[.]((0*1+{bin}*)|o)												{++tokencount; printf("Line %d --> Bin_FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.dval = bintoReal(yytext);return(T_FCONST);}
-
 ([1-9]{digit}*)?[.]((0*[1-9]+{digit}*)|0)										{++tokencount; printf("Line %d --> FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.dval = dectoReal(yytext);return(T_FCONST);}
 
  /* Integers */
@@ -90,7 +87,7 @@ whitespace                                                                      
 0(o|O)[1-7]{oct}*																{++tokencount; printf("Line %d --> Oct_ICONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.ival= octtoInt(yytext);return(T_ICONST);}
 0(b|B)1{bin}*				   													{++tokencount; printf("Line %d --> Bin_ICONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.ival = bintoInt(yytext);return(T_ICONST);}
 0|[1-9]{digit}*																	{++tokencount; printf("Line %d --> ICONST: %s | TOKEN #%d\n", linecount, yytext, tokencount); yylval.ival = dectoInt(yytext);return(T_ICONST);}
- 
+
  /* exponential elements */
 ([1-9]{digit}*)?[.]((0*[1-9]+{digit}*)|0)([E]([+-]?)(([1-9]{digit}*)|0))?		{++tokencount; printf("Line %d --> EXP_FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_FCONST);}
 0|[1-9]{digit}*([E]([+-]?)(([1-9]{digit}*)|0))?									{++tokencount; printf("Line %d --> EXP_FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_FCONST);}
@@ -155,7 +152,7 @@ whitespace                                                                      
 <STRING>\\v                                                                     {*buffer_ptr++; *buffer_ptr = '\v';}
 <STRING>\\\n                                                                    {++linecount;}
 <STRING>\\
-<STRING><<EOF>>                                                                 {/* yyerror */}
+<STRING><<EOF>>                                                                 {printf("SCONST ERROR");}
 
 <<EOF>>										                                    {return(T_EOF);}
 {whitespace}                                                                    {}
