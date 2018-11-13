@@ -1,6 +1,3 @@
-//reform id numbers... make EOF 0 or -1 and categorize
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -61,10 +58,11 @@
 #define T_RBRACK      52
 #define T_REFER       53
 #define T_LBRACE      54
-#define T_METH        55
-#define T_INP         56
-#define T_OUT         57
-#define T_ID          58
+#define T_RBRACE 	  55
+#define T_METH        56
+#define T_INP         57
+#define T_OUT         58
+#define T_ID          59
 
 #define STR_BUF		  256
 
