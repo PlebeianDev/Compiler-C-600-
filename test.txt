@@ -12,3 +12,10 @@ a100_version2__
 _
 __
 ___
+
+
+// comment a line
+asdasdas
+/*
+    MULTI COMMENT;
+*/
