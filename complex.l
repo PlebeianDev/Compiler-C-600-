@@ -196,7 +196,10 @@ double hextoReal(char *s){
 	len_r = strlen(character) - 1;
 	res = (int)strtol(&s[2], &character, 16);
 	for(i = 0; i <= len_r; i++){
-		res = (character[i]-'0')*(1/pow(16,i)) + res;
+        if(character[i] <= '9')
+            res = (character[i]-'0')*(1/pow(16,i)) + res;
+        else
+            res = (character[i]-'A')*(1/pow(16,i)) + res;
 	}
 	return res;
 }
