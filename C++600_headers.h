@@ -65,6 +65,7 @@
 #define T_ID          59
 
 #define STR_BUF		  256
+#define T_LISTFUNC	  60
 
 #define YYTYPE_IS_DECLARED
 typedef union{
