@@ -135,7 +135,7 @@ whitespace                                                                      
 
  /* SCONST */;
 \"                                                                              {buffer_ptr = buffer; BEGIN(STRING);}
-<STRING>\"                                                                      {*buffer_ptr = '\0'; BEGIN(INITIAL); {++tokencount; printf("Line %d --> TOKEN STRING: %s | TOKEN #%d\n", linecount, yytext, tokencount);}}
+<STRING>\"                                                                      {*buffer_ptr = '\0'; BEGIN(INITIAL);++tokencount; printf("Line %d --> TOKEN STRING: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_SCONST);}
 <STRING>\n                                                                      {printf("Invalid character"); yyterminate();}
 <STRING>\\n                                                                     {*buffer_ptr++; *buffer_ptr = '\n';}
 <STRING>\\f                                                                     {*buffer_ptr++; *buffer_ptr = '\f';}
