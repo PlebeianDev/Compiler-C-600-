@@ -7,6 +7,7 @@ void yyerror (char const *s);
 
 int tokencount = 0;
 int linecount = 1;
+int errorcount = 0;
 
 char buffer[STR_BUF];
 char* buffer_ptr;
@@ -153,11 +154,21 @@ whitespace                                                                      
 <<EOF>>										                                    {return(T_EOF);}
 {whitespace}                                                                    {}
 \n										                                        {++linecount;}
-.                                                                               {++tokencount;printf("Line %d --> %s TOKEN #%d\n", linecount, yytext, tokencount);yyerror("Invalid Unit");yyterminate();}
+.                                                                               {yyerror("Invalid Unit");++errorcount;
+																					if(errorcount == 2)
+																						errorcount = 0;
+																						yyterminate();
+																					else
+																						less(yyleng-1);
+																				}
 %%
 
 void yyerror (char const *s){
 	printf("Error\n|Line %d| Token #%d| %s\n", linecount, tokencount, s);
+	/* 	It must display the line number where the error occured, display the line itself
+		and use the yyless() operation to redefine the input buffer of lex, retry to read 
+		the new word and if it fails it will yyterminate() the analyzer.
+	*/
 }
 
 int dectoInt(char *s){
