@@ -6,16 +6,6 @@ a100_version_2_
 _a100_version_2_
 this_is_a_var_example_100_
 
-a100__version2
-100_version_2
-a100_version2__
-_
-__
-___
+1
 
-
-// comment a line
-asdasdas
-/*
-    MULTI COMMENT;
-*/
+typedef malakas{};
