@@ -155,18 +155,19 @@ whitespace                                                                      
 {whitespace}                                                                    {}
 \n										                                        {++linecount;}
 .                                                                               {yyerror("Invalid Unit");++errorcount;
-																					if(errorcount == 2)
+																					if(errorcount == 2){
 																						errorcount = 0;
 																						yyterminate();
+                                                                                    }
 																					else
-																						less(yyleng-1);
+																						yyless(yyleng-1);
 																				}
 %%
 
 void yyerror (char const *s){
 	printf("Error\n|Line %d| Token #%d| %s\n", linecount, tokencount, s);
 	/* 	It must display the line number where the error occured, display the line itself
-		and use the yyless() operation to redefine the input buffer of lex, retry to read 
+		and use the yyless() operation to redefine the input buffer of lex, retry to read
 		the new word and if it fails it will yyterminate() the analyzer.
 	*/
 }
