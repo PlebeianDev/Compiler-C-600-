@@ -1,9 +1,6 @@
 /*-----      STATEMENTS       -----*/
 %{
-    #include <stdio.h>
-    #include <stdlib.h>
-    #include <math.h>
-    #include <string.h>
+    #include "C++600_headers.h"
     int yylex(void);
     void yyerror(char const *s);
 
@@ -11,13 +8,20 @@
 
 %}
 
-%union{
+%typedef union{
     int ival;
     double dval;
     const char* strval;
-}
+}YYSTYPE
 
 %token<ival> T_INT, T_ENUM, T_LENGTH, T_ICONST
+%type<ival> int_exp
+%left T_ADDOP
+%left T_MULOP
+%left T_OROP
+%left T_ANDOP
+%left T_EQUOP
+
 %token<dval> T_FCONST
 %token<strval> T_CCONST, T_SCONST
 %token T_TYPEDEF, T_CHAR, T_STRING, T_CLASS, T_PRIVATE
@@ -34,7 +38,16 @@
  /* %left...? */;
 
 /*-----         RULES         -----*/
+%%
+input:              /* EMPTY STRING */
+                    | int_exp {/* Some feedback */}
+                    ;
+int_exp:            T_ICONST {$$ = $1;}
+                    | int_exp T_ADDOP int_exp {$$ = $1 + $3;}
+                    | int_exp T_MULOP int_exp {$$ = $1 * $3;}
+                    ;
 
+%%
 
 /*-----     USER FUNCTIONS    -----*/
 
