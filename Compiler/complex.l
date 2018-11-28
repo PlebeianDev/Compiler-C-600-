@@ -246,21 +246,3 @@ double bintoReal(char *s){
 }
 
 int yywrap(){}
-
-int main(int argc, char *args[]){
-  if(argc > 1){
-      yyin = fopen(args[1], "r");
-  }
-  else{
-      yyin = stdin;
-  }
-
-  while(yylex() != T_EOF){}
-  printf("Read %d Lines\n", linecount);
-  printf("Recognized %d Lectical Units\n", tokencount);
-
-  int x = yylval.ival;
-  printf("Number x is : %d\n", x);
-
-  return 0;
-}
