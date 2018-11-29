@@ -77,7 +77,7 @@ whitespace                                                                      
 0(x)([a-fA-F1-9]{hex}*)?[.]((0*[a-fA-F1-9]+{hex}*)|0)							{++tokencount; printf("Line %d --> Hex_FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.dval = hextoReal(yytext);printf("TOKEN literal value: %.2lf\n", hextoReal(yytext));return(T_FCONST);}
 0(o)([1-7]{oct}*)?[.]((0*[1-7]+{oct}*)|0)										{++tokencount; printf("Line %d --> Oct_FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.dval = octtoReal(yytext);printf("TOKEN literal value: %.2lf\n", octtoReal(yytext));return(T_FCONST);}
 0(b)(1{bin}*)?[.]((0*1+{bin}*)|o)												{++tokencount; printf("Line %d --> Bin_FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.dval = bintoReal(yytext);printf("TOKEN literal value: %.2lf\n", bintoReal(yytext));return(T_FCONST);}
-([1-9]{digit}*)?[.]((0*[1-9]+{digit}*)|0)										{++tokencount; printf("Line %d --> FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.dval = dectoReal(yytext);printf("TOKEN literal value: %.2lf\n", dectoReal(yytext));return(T_FCONST);}
+(0|[1-9]{digit}*)?[.]((0*[1-9]+{digit}*)|0)										{++tokencount; printf("Line %d --> FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.dval = dectoReal(yytext);printf("TOKEN literal value: %.2lf\n", dectoReal(yytext));return(T_FCONST);}
 
  /* Integers */
 0(x)[a-fA-F1-9]{hex}* 														{++tokencount; printf("Line %d --> Hex_ICONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.ival= hextoInt(yytext);printf("TOKEN literal value: %d\n", hextoInt(yytext));return(T_ICONST);}
