@@ -1,4 +1,3 @@
-/* Comments */;
 /* Definition Section */
 
 %{
@@ -39,7 +38,7 @@ whitespace                                                                      
 "char"                                                                          {++tokencount; printf("Line %d --> TOKEN CHAR: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_CHAR);}
 "int"                                                                           {++tokencount; printf("Line %d --> TOKEN INT: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_INT);}
 "float"                                                                         {++tokencount; printf("Line %d --> TOKEN FLOAT: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_FLOAT);}
-"str"                                                                           {++tokencount; printf("Line %d --> TOKEN STRING: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_STRING);}
+"string"                                                                           {++tokencount; printf("Line %d --> TOKEN STRING: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_STRING);}
 "class"                                                                         {++tokencount; printf("Line %d --> TOKEN CLASS: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_CLASS);}
 "private"                                                                       {++tokencount; printf("Line %d --> TOKEN PRIVATE: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_PRIVATE);}
 "protected"                                                                     {++tokencount; printf("Line %d --> TOKEN PROTECTED: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_PROTECTED);}
@@ -126,6 +125,7 @@ whitespace                                                                      
 ">>"                                                                            {++tokencount; printf("Line %d --> TOKEN INP: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_INP);}
 "<<"                                                                            {++tokencount; printf("Line %d --> TOKEN OUT: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_OUT);}
 
+ /* Comments */;
 "/*"                                                                            {BEGIN(COMMENT); buffer_ptr = buffer;}
 <COMMENT>"*"+"/"                                                                {BEGIN(INITIAL);}
 <COMMENT>"\n"                                                                   {++linecount;}
@@ -250,3 +250,22 @@ double bintoReal(char *s){
 }
 
 int yywrap(){}
+
+    int main(int argc, char *args[]){
+      if(argc > 1){
+          yyin = fopen(args[1], "r");
+      }
+      else{
+          yyin = stdin;
+      }
+
+      while(yylex() != T_EOF){}
+      printf("Read %d Lines\n", linecount);
+      printf("Recognized %d Lectical Units\n", tokencount);
+
+      /* do { */
+          /* yyparse();
+      } while(!feof(yyin)); */
+
+      return 0;
+    }

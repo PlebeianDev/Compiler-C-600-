@@ -7,11 +7,11 @@
     //define yyerror in here or in header
 %}
 
-%typedef union{
+%union{
     int ival;
     double dval;
-    const char* strval;
-}YYSTYPE
+    char* strval;
+}
 
 %token<ival> T_ICONST
 %token<dval> T_FCONST
@@ -28,6 +28,12 @@
 %token<strval> T_ASSIGN T_COLON T_LBRACK T_RBRACK T_REFER
 %token<strval> T_LBRACE T_RBRACE T_METH T_INP T_OUT
 %token<strval> T_ID T_LISTFUNC
+
+%left T_OROP T_ANDOP
+%left T_RELOP T_EQUOP
+%left T_ADDOP
+%left T_MULOP
+%right T_NOTOP T_SIZEOP
 
  /* See if more type are needed */;
 %type<dval> expression
@@ -53,10 +59,10 @@ typedef_declaration:                T_TYPEDEF typename listspec T_ID dims T_SEMI
 typename:                           standard_type
                                     | T_ID
                                     ;
-standard_type:                      T_CHAR              {$$ = $1;}
-                                    | T_INT             {$$ = $1;}
-                                    | T_FLOAT           {$$ = $1;}
-                                    | T_STRING          {$$ = $1;}
+standard_type:                      T_CHAR
+                                    | T_INT
+                                    | T_FLOAT
+                                    | T_STRING
                                     | T_VOID
                                     ;
 listspec:                           T_LIST
@@ -151,6 +157,8 @@ var_declaration:                    typename variabledefs T_SEMI
                                     ;
 variabledefs:                       variabledefs T_COMMA variabledef
                                     | variabledef
+                                    ;
+variabledef:                        listspec T_ID dims
                                     ;
 anonymous_union:                    T_UNION union_body T_SEMI
                                     ;
@@ -306,7 +314,7 @@ int main(int argc, char *args[]){
   /* while(yylex() != T_EOF){} */
   /* printf("Read %d Lines\n", linecount); */
   /* printf("Recognized %d Lectical Units\n", tokencount); */
-  
+
   do {
       yyparse();
   } while(!feof(yyin));

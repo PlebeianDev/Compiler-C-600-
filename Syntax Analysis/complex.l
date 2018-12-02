@@ -135,7 +135,7 @@ whitespace                                                                      
 
 "//"                                                                            {BEGIN(LINE_COMMENT); buffer_ptr = buffer;}
 <LINE_COMMENT>.                                                                 {}
-<LINE_COMMENT>[^\\\n\"]+                                                        {char *text = yytext; while(*text){*buffer_ptr++ = *text++;}}																	
+<LINE_COMMENT>[^\\\n\"]+                                                        {char *text = yytext; while(*text){*buffer_ptr++ = *text++;}}																	{}
 <LINE_COMMENT>"\n"                                                              {BEGIN(INITIAL); *buffer_ptr = '\0'; ++linecount;}
 
  /* SCONST */;
