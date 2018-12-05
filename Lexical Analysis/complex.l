@@ -134,7 +134,7 @@ whitespace                                                                      
 
 "//"                                                                            {BEGIN(LINE_COMMENT);}
 <LINE_COMMENT>"\n"                                                              {++linecount; BEGIN(INITIAL);}
-<LINE_COMMENT>.																	{}
+<LINE_COMMENT>.																	                                {}
 <LINE_COMMENT><<EOF>>                                                           {printf("LINE COMMENT ERROR\n"); yyterminate();}
 
  /* SCONST */;
@@ -163,6 +163,16 @@ whitespace                                                                      
  /* to be remade */
 void yyerror (char const *s){
 	printf("Lectical Error\n|Line %d| Token #%d: %s\n", linecount, tokencount+errorcount+1, s);
+  /*  This function will change as such:
+      1.  It will be keeping the past errors in a history string array with size of 5
+      2.  yyerror will be monitoring the array during every new error. If the size becomes greater than 5
+          then the yyerror will send a flag to the possible error generating spot, asking it to make a yyterminate
+          if the flag is not for termination, the code will do a yyless and reenter the lectical analyzer.
+      3.  yyless = yyless(yyleng-1) will take the yytext[n-1] instead of yytext[n].
+      4   Upon reaching the termination stage, yyerror will print the whole error array by showing each error individually
+          and also announcing the line and token where the error occured.
+      5.  during the run, flex will have to be continuous. This means that no error messages will pop up, until the >5 condition.
+  */
 }
 
 int dectoInt(char *s){
