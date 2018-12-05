@@ -8,7 +8,11 @@ void yyerror (char const *s);
 int tokencount = 0;
 int linecount = 1;
 int errorcount = 0;
-
+/*
+to GK-san
+better remain unused till yyerror main algorithm is implemented!
+char *error_history[5];
+*/
 char buffer[STR_BUF];
 char* buffer_ptr;
 YYSTYPE yylval;
