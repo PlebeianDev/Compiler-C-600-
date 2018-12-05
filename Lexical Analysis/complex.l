@@ -140,7 +140,7 @@ whitespace                                                                      
  /* SCONST */;
 \"                                                                              {BEGIN(STRING); buffer_ptr = buffer;}
 <STRING>\"                                                                      {BEGIN(INITIAL); *buffer_ptr = '\0'; ++tokencount; printf("Line %d --> TOKEN SCONST: %s | TOKEN #%d\n", linecount, buffer, tokencount);yylval.strval = strdup(buffer); return(T_SCONST);}
-<STRING>\n                                                                      {yyerror("Illegal input in string"); return(-1);}
+<STRING>\n                                                                      {yyerror("invalid character"); return(-1);}
 <STRING>\\n                                                                     {*buffer_ptr = '\n'; *buffer_ptr++;}
 <STRING>\\f                                                                     {*buffer_ptr = '\f'; *buffer_ptr++;}
 <STRING>\\t                                                                     {*buffer_ptr = '\t'; *buffer_ptr++;}
