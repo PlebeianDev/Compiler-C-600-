@@ -1,0 +1,5 @@
+lex.out: lex.yy.c
+	gcc -o lex.out lex.yy.c -lm
+
+lex.yy.c: complex.l
+	flex complex.l
