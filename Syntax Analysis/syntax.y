@@ -29,14 +29,21 @@
 %token<strval> T_LBRACE T_RBRACE T_METH T_INP T_OUT
 %token<strval> T_ID T_LISTFUNC
 
+%left T_COMMA
 %left T_OROP T_ANDOP
 %left T_RELOP T_EQUOP
 %left T_ADDOP
 %left T_MULOP
 %right T_NOTOP T_SIZEOP
 
- /* See if more type are needed */;
-%type<dval> expression
+%type <strval> program global_declaration global_declarations typedef_declaration typename standard_type listspec dims dim enum_declaration
+%type <strval> enum_body id_list initializer init_value expression variable general_expression assignment expression_list constant listexpression
+%type <strval> init_values class_declaration class_body parent members_methods access member_or_method member var_declaration variabledefs variabledef
+%type <strval> anonymous_union union_body fields field method short_func_declaration short_par_func_header func_header_start parameter_types
+%type <strval> pass_list_dims nopar_func_header union_declaration global_var_declaration init_variabledefs init_variabledef func_declaration full_func_declaration
+%type <strval> full_par_func_header class_func_header_start func_class parameter_list pass_variabledef nopar_class_func_header decl_statements declarations decltype
+%type <strval> statements statement expression_statement if_statement if_tail while_statement for_statement optexpr switch_statement switch_tail decl_cases
+%type <strval> casestatements casestatement single_casestatement return_statement io_statement in_list in_item out_list out_item comp_statement main_function main_header
 
 %start program
 
@@ -117,7 +124,7 @@ general_expression:                 general_expression T_COMMA general_expressio
                                     | assignment
                                     ;
 assignment:                         variable T_ASSIGN assignment
-                                    | assignment
+                                    | expression
                                     ;
 expression_list:                    general_expression
                                     | /*ε*/
