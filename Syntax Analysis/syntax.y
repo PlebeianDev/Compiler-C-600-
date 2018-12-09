@@ -30,11 +30,13 @@
 %token<strval> T_ID T_LISTFUNC
 
 %left T_COMMA
-%left T_OROP T_ANDOP
-%left T_RELOP T_EQUOP
+%left T_OROP
+%left T_ANDOP
+%left T_EQUOP
+%left T_RELOP
 %left T_ADDOP
 %left T_MULOP
-%right T_NOTOP T_SIZEOP
+%right T_SIZEOP T_NOTOP
 
 %type <strval> program global_declaration global_declarations typedef_declaration typename standard_type listspec dims dim enum_declaration
 %type <strval> enum_body id_list initializer init_value expression variable general_expression assignment expression_list constant listexpression
