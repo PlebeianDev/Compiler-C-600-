@@ -3625,6 +3625,7 @@ State 241
    36           | expression . T_ADDOP expression
    37           | expression . T_MULOP expression
 
+    T_ANDOP  shift, and go to state 177
     T_EQUOP  shift, and go to state 178
     T_RELOP  shift, and go to state 179
     T_ADDOP  shift, and go to state 180
@@ -3661,6 +3662,7 @@ State 243
    36           | expression . T_ADDOP expression
    37           | expression . T_MULOP expression
 
+    T_RELOP  shift, and go to state 179
     T_ADDOP  shift, and go to state 180
     T_MULOP  shift, and go to state 181
 
