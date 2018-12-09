@@ -114,7 +114,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 10 "syntax.y" /* yacc.c:1909  */
+#line 14 "syntax.y" /* yacc.c:1909  */
 
     int ival;
     double dval;

@@ -1,10 +1,14 @@
 /*-----      STATEMENTS       -----*/
 %{
     #include "C++600_headers.h"
+    #include "hashtbl.h"
     extern int yylex();
     extern int yyparse();
     extern FILE* yyin;
-    //define yyerror in here or in header
+
+    /* Hashtable components */
+    int scope = 0;
+    HASHTBL *hashtbl;
 %}
 
 %union{
@@ -54,7 +58,7 @@
 program:                            global_declarations main_function
                                     ;
 global_declarations:                global_declarations global_declaration
-                                    | /*ε*/
+                                    | %empty {}
                                     ;
 global_declaration:                 typedef_declaration
                                     | enum_declaration
@@ -63,10 +67,11 @@ global_declaration:                 typedef_declaration
                                     | global_var_declaration
                                     | func_declaration
                                     ;
-typedef_declaration:                T_TYPEDEF typename listspec T_ID dims T_SEMI
+typedef_declaration:                T_TYPEDEF typename listspec T_ID                            {hashtbl_insert(hashtbl, $4, NULL, scope); scope++;}
+                                    dims T_SEMI                                                 {hashtbl_get(hashtbl, scope); scope--;}
                                     ;
 typename:                           standard_type
-                                    | T_ID
+                                    | T_ID                                                      {hashtbl_insert(hashtbl, $1, NULL, scope);}
                                     ;
 standard_type:                      T_CHAR
                                     | T_INT
@@ -75,23 +80,26 @@ standard_type:                      T_CHAR
                                     | T_VOID
                                     ;
 listspec:                           T_LIST
-                                    | /*ε*/
+                                    | %empty {}
                                     ;
 dims:                               dims dim
-                                    | /*ε*/
+                                    | %empty {}
                                     ;
 dim:                                T_LBRACK T_ICONST T_RBRACK
                                     | T_LBRACK T_RBRACK
                                     ;
-enum_declaration:                   T_ENUM T_ID enum_body T_SEMI
+enum_declaration:                   T_ENUM T_ID                                                 {hashtbl_insert(hashtbl, $2, NULL, scope); scope++;}
+                                    enum_body                                                   {hashtbl_get(hashtbl, scope);scope--;}
+                                    T_SEMI
                                     ;
 enum_body:                          T_LBRACE id_list T_RBRACE
                                     ;
-id_list:                            id_list T_COMMA T_ID initializer
-                                    | T_ID initializer
+id_list:                            id_list T_COMMA T_ID initializer                            {hashtbl_insert(hashtbl, $3, NULL, scope);}
+                                    | T_ID                                                      {hashtbl_insert(hashtbl, $1, NULL, scope);} 
+                                    initializer
                                     ;
 initializer:                        T_ASSIGN init_value
-                                    | /*ε*/
+                                    | %empty {}
                                     ;
 init_value:                         expression
                                     | T_LBRACE init_values T_RBRACE
@@ -129,7 +137,7 @@ assignment:                         variable T_ASSIGN assignment
                                     | expression
                                     ;
 expression_list:                    general_expression
-                                    | /*ε*/
+                                    | %empty {}
                                     ;
 constant:                           T_CCONST
                                     | T_ICONST
@@ -146,7 +154,7 @@ class_declaration:                  T_CLASS T_ID class_body T_SEMI
 class_body:                         parent T_LBRACE members_methods T_RBRACE
                                     ;
 parent:                             T_COLON T_ID
-                                    | /*ε*/
+                                    | %empty {}
                                     ;
 members_methods:                    members_methods access member_or_method
                                     | access member_or_method
@@ -154,7 +162,7 @@ members_methods:                    members_methods access member_or_method
 access:                             T_PRIVATE T_COLON
                                     | T_PROTECTED T_COLON
                                     | T_PUBLIC T_COLON
-                                    | /*ε*/
+                                    | %empty {}
                                     ;
 member_or_method:                   member
                                     | method
@@ -229,13 +237,13 @@ nopar_class_func_header:            class_func_header_start T_LPAREN T_RPAREN
 decl_statements:                    declarations statements
                                     | declarations
                                     | statements
-                                    | /*ε*/
+                                    | %empty {}
                                     ;
 declarations:                       declarations decltype typename variabledefs T_SEMI
                                     | decltype typename variabledefs T_SEMI
                                     ;
 decltype:                           T_STATIC
-                                    | /*ε*/
+                                    | %empty {}
                                     ;
 statements:                         statements statement
                                     | statement
@@ -257,14 +265,14 @@ expression_statement:               general_expression T_SEMI
 if_statement:                       T_IF T_LPAREN general_expression T_RPAREN statement if_tail
                                     ;
 if_tail:                            T_ELSE statement
-                                    | /*ε*/
+                                    | %empty {}
                                     ;
 while_statement:                    T_WHILE T_LPAREN general_expression T_RPAREN statement
                                     ;
 for_statement:                      T_FOR T_LPAREN optexpr T_SEMI optexpr T_SEMI optexpr T_RPAREN statement
                                     ;
 optexpr:                            general_expression
-                                    | /*ε*/
+                                    | %empty {}
                                     ;
 switch_statement:                   T_SWITCH T_LPAREN general_expression T_RPAREN switch_tail
                                     ;
@@ -274,7 +282,7 @@ switch_tail:                        T_LBRACE decl_cases T_RBRACE
 decl_cases:                         declarations casestatements
                                     | declarations
                                     | casestatements
-                                    | /*ε*/
+                                    | %empty {}
                                     ;
 casestatements:                     casestatements casestatement
                                     | casestatement
@@ -312,6 +320,24 @@ main_header:                        T_INP T_MAIN T_LPAREN T_RPAREN
 
 /*-----     USER FUNCTIONS    -----*/
 
+void yyerror (char *s, int error_distinction){
+    errorcount++;
+    if(error_distinction == 1){// an unrecognizable character.
+		printf("Error in l.%d | Token #%d \033[1;31m %s: %s\n \033[0m \n", linecount, tokencount+errorcount, yytext, s);
+    }else if(error_distinction == 0){// unacceptable characters in strings.
+		*buffer_ptr = '\0';   // terminate the error causing string so you can print it.
+        printf("Error in l.%d | Token #%d \033[1;31m \"%s\": %s\n \033[0m \n", linecount, tokencount+errorcount, buffer, s);
+	}
+    else{// premature end for comments; mainly for multiline comments;
+        printf("Error in l.%d |\033[1;31m %s \033[0m \n", linecount, s);
+    }
+    /* if(MAX_ERRORS <= 0) return; */
+    if(errorcount == 5){
+        printf("Reached maximum number of errors! Exiting Analyzer\n");
+        exit(-1); // terminate the whole analyzing process;
+    }
+}
+
 int main(int argc, char *args[]){
   if(argc > 1){
       yyin = fopen(args[1], "r");
@@ -320,13 +346,30 @@ int main(int argc, char *args[]){
       yyin = stdin;
   }
 
-  /* while(yylex() != T_EOF){} */
-  /* printf("Read %d Lines\n", linecount); */
-  /* printf("Recognized %d Lectical Units\n", tokencount); */
+  /* while(yylex() != T_EOF){}
+  printf("Read %d Lines\n", linecount);
+  printf("Recognized %d Lectical Units\n", tokencount); */
 
   do {
       yyparse();
   } while(!feof(yyin));
 
   return 0;
+  /* old part of yyerror  if(errorcount <= 5){
+        em[errorcount-1].form = strdup(print_expr);
+        em[errorcount-1].current_line = linecount;
+        em[errorcount-1].message = strdup(s);
+        em[errorcount-1].current_tokencount = tokencount+errorcount;
+        em[errorcount-1].current_token = strdup(yytext);
+        if(flag == 1)
+          yyless(yyleng-1);
+      }
+      else if(errorcount > 5){
+        printf("\n-----------------------------------------------\n");
+        for(i = 0; i < errorcount; i++){
+          printf(em[i].form, em[i].current_line, em[i].current_tokencount, em[i].message, em[i].current_token);
+        }
+        yyterminate();
+      } */
+
 }
