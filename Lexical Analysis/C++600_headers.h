@@ -74,7 +74,7 @@ typedef union{
 	double dval;
 }YYSTYPE;
 
-void yyerror (char const *s);
+void yyerror (char *s, int error_distinction);
 int dectoInt(char *s);
 int hextoInt(char *s);
 int octtoInt(char *s);

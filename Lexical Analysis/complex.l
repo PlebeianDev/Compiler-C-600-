@@ -2,17 +2,22 @@
 
 %{
 #include "C++600_headers.h"
-
-void yyerror (char const *s);
+/*
+struct error_history{
+  char *form;
+  char *message;
+  int current_line;
+  int current_tokencount;
+  char *current_token;
+};
+typedef struct error_history eh; */
 
 int tokencount = 0;
 int linecount = 1;
 int errorcount = 0;
-/*
-to GK-san
-better remain unused till yyerror main algorithm is implemented!
-char *error_history[5];
-*/
+
+/* eh em[5]; */
+
 char buffer[STR_BUF];
 char* buffer_ptr;
 YYSTYPE yylval;
@@ -71,27 +76,27 @@ whitespace                                                                      
 "sizeof"                                                                        {++tokencount; printf("Line %d --> TOKEN SIZEOF: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_SIZEOP);}
 
  /* list func */
-[C](([A][D]*)|([D]+))[R]														                            {++tokencount; printf("Line %d --> LISTFUNC: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_LISTFUNC);}
+[C](([A][D]*)|([D]+))[R]							                            {++tokencount; printf("Line %d --> LISTFUNC: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_LISTFUNC);}
 
  /* IDENTIFIER */;
 \_*{letter}+(\_{1}?{alnum}|{alnum})*\_?                                         {++tokencount; printf("Line %d --> TOKEN ID: %s | TOKEN #%d\n", linecount, yytext, tokencount); yylval.strval = strdup(yytext); return(T_ID);}
 
  /* DATA TYPES */;
  /* Floating point */
-0(x|X)([a-fA-F1-9]{hex}*)?[.]((0*[a-fA-F1-9]+{hex}*)|0)							            {++tokencount; printf("Line %d --> Hex_FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.dval = hextoReal(yytext);printf("TOKEN literal value: %.2lf\n", hextoReal(yytext));return(T_FCONST);}
-0(o|O)([1-7]{oct}*)?[.]((0*[1-7]+{oct}*)|0)										                  {++tokencount; printf("Line %d --> Oct_FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.dval = octtoReal(yytext);printf("TOKEN literal value: %.2lf\n", octtoReal(yytext));return(T_FCONST);}
-0(b|B)(1{bin}*)?[.]((0*1+{bin}*)|o)											                      	{++tokencount; printf("Line %d --> Bin_FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.dval = bintoReal(yytext);printf("TOKEN literal value: %.2lf\n", bintoReal(yytext));return(T_FCONST);}
-([1-9]{digit}*)?[.]((0*[1-9]+{digit}*)|0)										                    {++tokencount; printf("Line %d --> FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.dval = dectoReal(yytext);printf("TOKEN literal value: %.2lf\n", dectoReal(yytext));return(T_FCONST);}
+0(x|X)([a-fA-F1-9]{hex}*)?[.]((0*[a-fA-F1-9]+{hex}*)|0)				            {++tokencount; printf("Line %d --> Hex_FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.dval = hextoReal(yytext);printf("TOKEN literal value: %.2lf\n", hextoReal(yytext));return(T_FCONST);}
+0(o|O)([1-7]{oct}*)?[.]((0*[1-7]+{oct}*)|0)                                     {++tokencount; printf("Line %d --> Oct_FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.dval = octtoReal(yytext);printf("TOKEN literal value: %.2lf\n", octtoReal(yytext));return(T_FCONST);}
+0(b|B)(1{bin}*)?[.]((0*1+{bin}*)|o)										     	{++tokencount; printf("Line %d --> Bin_FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.dval = bintoReal(yytext);printf("TOKEN literal value: %.2lf\n", bintoReal(yytext));return(T_FCONST);}
+([1-9]{digit}*)?[.]((0*[1-9]+{digit}*)|0)					                    {++tokencount; printf("Line %d --> FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.dval = dectoReal(yytext);printf("TOKEN literal value: %.2lf\n", dectoReal(yytext));return(T_FCONST);}
 
  /* Integers */
-0(x|X)[a-fA-F1-9]{hex}* 														                            {++tokencount; printf("Line %d --> Hex_ICONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.ival= hextoInt(yytext);printf("TOKEN literal value: %d\n", hextoInt(yytext));return(T_ICONST);}
-0(o|O)[1-7]{oct}*																                                {++tokencount; printf("Line %d --> Oct_ICONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.ival= octtoInt(yytext);printf("TOKEN literal value: %d\n", octtoInt(yytext));return(T_ICONST);}
-0(b|B)1{bin}*				   													                                {++tokencount; printf("Line %d --> Bin_ICONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.ival = bintoInt(yytext);printf("TOKEN literal value: %d\n", bintoInt(yytext));return(T_ICONST);}
-0|[1-9]{digit}*																	                                {++tokencount; printf("Line %d --> ICONST: %s | TOKEN #%d\n", linecount, yytext, tokencount); yylval.ival = dectoInt(yytext);printf("TOKEN literal value: %d\n", dectoInt(yytext));return(T_ICONST);}
+0(x|X)[a-fA-F1-9]{hex}* 							                            {++tokencount; printf("Line %d --> Hex_ICONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.ival= hextoInt(yytext);printf("TOKEN literal value: %d\n", hextoInt(yytext));return(T_ICONST);}
+0(o|O)[1-7]{oct}*								                                {++tokencount; printf("Line %d --> Oct_ICONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.ival= octtoInt(yytext);printf("TOKEN literal value: %d\n", octtoInt(yytext));return(T_ICONST);}
+0(b|B)1{bin}*									                                {++tokencount; printf("Line %d --> Bin_ICONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.ival = bintoInt(yytext);printf("TOKEN literal value: %d\n", bintoInt(yytext));return(T_ICONST);}
+0|[1-9]{digit}*									                                {++tokencount; printf("Line %d --> ICONST: %s | TOKEN #%d\n", linecount, yytext, tokencount); yylval.ival = dectoInt(yytext);printf("TOKEN literal value: %d\n", dectoInt(yytext));return(T_ICONST);}
 
  /* exponential elements */
-([1-9]{digit}*)?[.]((0*[1-9]+{digit}*)|0)([E]([+-]?)(([1-9]{digit}*)|0))?		    {++tokencount; printf("Line %d --> EXP_FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_FCONST);}
-0|[1-9]{digit}*([E]([+-]?)(([1-9]{digit}*)|0))?									                {++tokencount; printf("Line %d --> EXP_FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_FCONST);}
+([1-9]{digit}*)?[.]((0*[1-9]+{digit}*)|0)([E]([+-]?)(([1-9]{digit}*)|0))?		{++tokencount; printf("Line %d --> EXP_FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_FCONST);}
+0|[1-9]{digit}*([E]([+-]?)(([1-9]{digit}*)|0))?									{++tokencount; printf("Line %d --> EXP_FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_FCONST);}
 
  /* CCONST */;
 \'\\n\'                                                                         {++tokencount; printf("Line %d --> TOKEN CCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.strval = strdup(yytext); return(T_CCONST);}
@@ -134,17 +139,17 @@ whitespace                                                                      
 <COMMENT>"*/"                                                                   {BEGIN(INITIAL);}
 <COMMENT>"\n"                                                                   {++linecount;}
 <COMMENT>.                                                                      {/* this part is ignored */}
-<COMMENT><<EOF>>                                                                {printf(" MULTI LINE COMMENT ERROR\n"); yyterminate();}
+<COMMENT><<EOF>>                                                                {yyerror("fatal error: MULTI LINE COMMENT ERROR\n", 2);yyterminate();}
 
 "//"                                                                            {BEGIN(LINE_COMMENT);}
 <LINE_COMMENT>"\n"                                                              {++linecount; BEGIN(INITIAL);}
-<LINE_COMMENT>.																	                                {}
-<LINE_COMMENT><<EOF>>                                                           {printf("LINE COMMENT ERROR\n"); yyterminate();}
+<LINE_COMMENT>.																	{}
+<LINE_COMMENT><<EOF>>                                                           {yyerror("fatal error: LINE COMMENT ERROR\n", 2);yyterminate(); /* since it can't continue if it is not terminated*/}
 
  /* SCONST */;
 \"                                                                              {BEGIN(STRING); buffer_ptr = buffer;}
 <STRING>\"                                                                      {BEGIN(INITIAL); *buffer_ptr = '\0'; ++tokencount; printf("Line %d --> TOKEN SCONST: %s | TOKEN #%d\n", linecount, buffer, tokencount);yylval.strval = strdup(buffer); return(T_SCONST);}
-<STRING>\n                                                                      {yyerror("invalid character"); return(-1);}
+<STRING>\n                                                                      {yyerror("fatal error: illegal linefeed in string", 0);yyterminate();}
 <STRING>\\n                                                                     {*buffer_ptr = '\n'; *buffer_ptr++;}
 <STRING>\\f                                                                     {*buffer_ptr = '\f'; *buffer_ptr++;}
 <STRING>\\t                                                                     {*buffer_ptr = '\t'; *buffer_ptr++;}
@@ -156,27 +161,31 @@ whitespace                                                                      
 <STRING>\\\n                                                                    {linecount++;}
 <STRING>\\{alnum}?                                                              {*buffer_ptr = yytext[1]; *buffer_ptr++;}
 <STRING>.                                                                       {char *token_index = yytext; while (*token_index){ *buffer_ptr = *token_index; *buffer_ptr++; *token_index++;}}
-<STRING><<EOF>>                                                                 {yyerror("Unterminated string"); return(-1);}
+<STRING><<EOF>>                                                                 {yyerror("fatal error: missing \"\t", 0);yyterminate();}
 
-<<EOF>>										                                                      {return(T_EOF);}
+<<EOF>>										                                    {printf("\n\033[1;33mAnalyzer Finished! \033[0m\n");return(T_EOF);}
 {whitespace}*                                                                   {}
-\n										                                                          {++linecount;}
-.                                                                               {yyerror(strdup(yytext));++errorcount; if(errorcount == 2){errorcount = 0; yyterminate();} else	yyless(yyleng-1); /*to have a yyerror*/}
+\n										                                        {++linecount;}
+.                                                                               {yyerror("Invalid token", 1); yyless(1); /*since we want to reenter the token, without the character who is causing the error*/}
 %%
 
  /* to be remade */
-void yyerror (char const *s){
-	printf("Lectical Error\n|Line %d| Token #%d: %s\n", linecount, tokencount+errorcount+1, s);
-  /*  This function will change as such:
-      1.  It will be keeping the past errors in a history string array with size of 5
-      2.  yyerror will be monitoring the array during every new error. If the size becomes greater than 5
-          then the yyerror will send a flag to the possible error generating spot, asking it to make a yyterminate
-          if the flag is not for termination, the code will do a yyless and reenter the lectical analyzer.
-      3.  yyless = yyless(yyleng-1) will take the yytext[n-1] instead of yytext[n].
-      4   Upon reaching the termination stage, yyerror will print the whole error array by showing each error individually
-          and also announcing the line and token where the error occured.
-      5.  during the run, flex will have to be continuous. This means that no error messages will pop up, until the >5 condition.
-  */
+void yyerror (char *s, int error_distinction){
+    errorcount++;
+    if(error_distinction == 1){// an unrecognizable character.
+		printf("Error in l.%d | Token #%d \033[1;31m %s: %s\n \033[0m \n", linecount, tokencount+errorcount, yytext, s);
+    }else if(error_distinction == 0){// unacceptable characters in strings.
+		*buffer_ptr = '\0';   // terminate the error causing string so you can print it.
+        printf("Error in l.%d | Token #%d \033[1;31m \"%s\": %s\n \033[0m \n", linecount, tokencount+errorcount, buffer, s);
+	}
+    else{// premature end for comments; mainly for multiline comments;
+        printf("Error in l.%d |\033[1;31m %s \033[0m \n", linecount, s);
+    }
+    /* if(MAX_ERRORS <= 0) return; */
+    if(errorcount == 5){
+        printf("Reached maximum number of errors! Exiting Analyzer\n");
+        exit(-1); // terminate the whole analyzing process;
+    }
 }
 
 int dectoInt(char *s){
@@ -267,4 +276,21 @@ int main(int argc, char *args[]){
   printf("Recognized %d Lectical Units\n", tokencount);
 
   return 0;
+  /* old part of yyerror  if(errorcount <= 5){
+        em[errorcount-1].form = strdup(print_expr);
+        em[errorcount-1].current_line = linecount;
+        em[errorcount-1].message = strdup(s);
+        em[errorcount-1].current_tokencount = tokencount+errorcount;
+        em[errorcount-1].current_token = strdup(yytext);
+        if(flag == 1)
+          yyless(yyleng-1);
+      }
+      else if(errorcount > 5){
+        printf("\n-----------------------------------------------\n");
+        for(i = 0; i < errorcount; i++){
+          printf(em[i].form, em[i].current_line, em[i].current_tokencount, em[i].message, em[i].current_token);
+        }
+        yyterminate();
+      } */
+
 }
