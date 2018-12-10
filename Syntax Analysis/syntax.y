@@ -95,7 +95,7 @@ enum_declaration:                   T_ENUM T_ID                                 
 enum_body:                          T_LBRACE id_list T_RBRACE
                                     ;
 id_list:                            id_list T_COMMA T_ID initializer                            {hashtbl_insert(hashtbl, $3, NULL, scope);}
-                                    | T_ID                                                      {hashtbl_insert(hashtbl, $1, NULL, scope);} 
+                                    | T_ID                                                      {hashtbl_insert(hashtbl, $1, NULL, scope);}
                                     initializer
                                     ;
 initializer:                        T_ASSIGN init_value
@@ -125,9 +125,9 @@ expression:                         expression T_OROP expression
                                     | listexpression
                                     ;
 variable:                           variable T_LBRACK general_expression T_RBRACK
-                                    | variable T_DOT T_ID
+                                    | variable T_DOT T_ID                                       {hashtbl_insert(hashtbl, $3, NULL, scope);}
                                     | T_LISTFUNC T_LPAREN general_expression T_RPAREN
-                                    | decltype T_ID
+                                    | decltype T_ID                                             {hashtbl_insert(hashtbl, $2, NULL, scope);}
                                     | T_THIS
                                     ;
 general_expression:                 general_expression T_COMMA general_expression
@@ -149,11 +149,13 @@ listexpression:                     T_LBRACK expression_list T_RBRACK
 init_values:                        init_values T_COMMA init_value
                                     | init_value
                                     ;
-class_declaration:                  T_CLASS T_ID class_body T_SEMI
+class_declaration:                  T_CLASS T_ID                                                {hashtbl_insert(hashtbl, $2, NULL, scope); scope++;}
+                                    class_body
+                                    T_SEMI                                                      {hashtbl_get(hashtbl, scope); scope--;}
                                     ;
 class_body:                         parent T_LBRACE members_methods T_RBRACE
                                     ;
-parent:                             T_COLON T_ID
+parent:                             T_COLON T_ID                                                {hashtbl_insert(hashtbl, $2, NULL, scope);}
                                     | %empty {}
                                     ;
 members_methods:                    members_methods access member_or_method
@@ -175,9 +177,11 @@ var_declaration:                    typename variabledefs T_SEMI
 variabledefs:                       variabledefs T_COMMA variabledef
                                     | variabledef
                                     ;
-variabledef:                        listspec T_ID dims
+variabledef:                        listspec T_ID dims                                          {hashtbl_insert(hashtbl, $2, NULL, scope);}
                                     ;
-anonymous_union:                    T_UNION union_body T_SEMI
+anonymous_union:                    T_UNION                                                     {scope++;}
+                                    union_body                                                  {hashtbl_get(hashtbl, scope); scope--;}
+                                    T_SEMI
                                     ;
 union_body:                         T_LBRACE fields T_RBRACE
                                     ;
@@ -188,12 +192,12 @@ field:                              var_declaration
                                     ;
 method:                             short_func_declaration
                                     ;
-short_func_declaration:             short_par_func_header T_SEMI
-                                    | nopar_func_header T_SEMI
+short_func_declaration:             short_par_func_header T_SEMI                                {hashtbl_get(hashtbl, scope); scope--;}
+                                    | nopar_func_header T_SEMI                                  {hashtbl_get(hashtbl, scope); scope--;}
                                     ;
 short_par_func_header:              func_header_start T_LPAREN parameter_types T_RPAREN
                                     ;
-func_header_start:                  typename listspec T_ID
+func_header_start:                  typename listspec T_ID                                      {hashtbl_insert(hashtbl, $3, NULL, scope); scope++;}
                                     ;
 parameter_types:                    parameter_types T_COMMA typename pass_list_dims
                                     | typename pass_list_dims
@@ -203,7 +207,9 @@ pass_list_dims:                     T_REFER
                                     ;
 nopar_func_header:                  func_header_start T_LPAREN T_RPAREN
                                     ;
-union_declaration:                  T_UNION T_ID union_body T_SEMI
+union_declaration:                  T_UNION T_ID                                                {hashtbl_insert(hashtbl, $2, NULL, scope); scope++;}
+                                    union_body
+                                    T_SEMI                                                      {hashtbl_get(hashtbl, scope); scope--;}
                                     ;
 global_var_declaration:             typename init_variabledefs T_SEMI
                                     ;
@@ -215,22 +221,22 @@ init_variabledef:                   variabledef initializer
 func_declaration:                   short_func_declaration
                                     | full_func_declaration
                                     ;
-full_func_declaration:              full_par_func_header T_LBRACE decl_statements T_RBRACE
-                                    | nopar_class_func_header T_LBRACE decl_statements T_RBRACE
-                                    | nopar_func_header T_LBRACE decl_statements T_RBRACE
+full_func_declaration:              full_par_func_header T_LBRACE decl_statements T_RBRACE      {hashtbl_get(hashtbl, scope); scope--;}
+                                    | nopar_class_func_header T_LBRACE decl_statements T_RBRACE {hashtbl_get(hashtbl, scope); scope--;}
+                                    | nopar_func_header T_LBRACE decl_statements T_RBRACE       {hashtbl_get(hashtbl, scope); scope--;}
                                     ;
 full_par_func_header:               class_func_header_start T_LPAREN parameter_list T_RPAREN
                                     | func_header_start T_LPAREN parameter_list T_RPAREN
                                     ;
-class_func_header_start:            typename listspec func_class T_ID
+class_func_header_start:            typename listspec func_class T_ID                           {hashtbl_insert(hashtbl, $4, NULL, scope); scope++;}
                                     ;
-func_class:                         T_ID T_METH
+func_class:                         T_ID T_METH                                                 {hashtbl_insert(hashtbl, $1, NULL, scope);}
                                     ;
 parameter_list:                     parameter_list T_COMMA typename pass_variabledef
                                     | typename pass_variabledef
                                     ;
 pass_variabledef:                   variabledef
-                                    | T_REFER T_ID
+                                    | T_REFER T_ID                                              {hashtbl_insert(hashtbl, $2, NULL, scope);}
                                     ;
 nopar_class_func_header:            class_func_header_start T_LPAREN T_RPAREN
                                     ;
@@ -262,19 +268,25 @@ statement:                          expression_statement
                                     ;
 expression_statement:               general_expression T_SEMI
                                     ;
-if_statement:                       T_IF T_LPAREN general_expression T_RPAREN statement if_tail
+if_statement:                       T_IF T_LPAREN                                               {scope++;}
+                                    general_expression T_RPAREN statement                       {hashtbl_get(hashtbl, scope); scope--;}
+                                    if_tail
                                     ;
-if_tail:                            T_ELSE statement
+if_tail:                            T_ELSE                                                      {scope++;}
+                                    statement                                                   {hashtbl_get(hashtbl, scope); scope--;}
                                     | %empty {}
                                     ;
-while_statement:                    T_WHILE T_LPAREN general_expression T_RPAREN statement
+while_statement:                    T_WHILE T_LPAREN                                            {scope++;}
+                                    general_expression T_RPAREN statement                       {hashtbl_get(hashtbl, scope); scope--;}
                                     ;
-for_statement:                      T_FOR T_LPAREN optexpr T_SEMI optexpr T_SEMI optexpr T_RPAREN statement
+for_statement:                      T_FOR T_LPAREN                                              {scope++;}
+                                    optexpr T_SEMI optexpr T_SEMI optexpr T_RPAREN statement    {hashtbl_get(hashtbl, scope); scope--;}
                                     ;
 optexpr:                            general_expression
                                     | %empty {}
                                     ;
-switch_statement:                   T_SWITCH T_LPAREN general_expression T_RPAREN switch_tail
+switch_statement:                   T_SWITCH T_LPAREN                                           {scope++;}
+                                    general_expression T_RPAREN switch_tail                     {hashtbl_get(hashtbl, scope); scope--;}
                                     ;
 switch_tail:                        T_LBRACE decl_cases T_RBRACE
                                     | single_casestatement
@@ -288,11 +300,14 @@ casestatements:                     casestatements casestatement
                                     | casestatement
                                     ;
 casestatement:                      T_CASE constant T_COLON casestatement
-                                    | T_CASE constant T_COLON statements
-                                    | T_DEFAULT T_COLON statements
+                                    | T_CASE constant T_COLON                                   {scope++;}
+                                    statements                                                  {hashtbl_get(hashtbl, scope); scope--;}
+                                    | T_DEFAULT T_COLON                                         {scope++;}
+                                    statements                                                  {hashtbl_get(hashtbl, scope); scope--;}
                                     ;
 single_casestatement:               T_CASE constant T_COLON single_casestatement
-                                    | T_CASE constant T_COLON statement
+                                    | T_CASE constant T_COLON                                   {scope++;}
+                                    statement                                                   {hashtbl_get(hashtbl, scope); scope--;}
                                     ;
 return_statement:                   T_RETURN optexpr T_SEMI
                                     ;
@@ -311,9 +326,10 @@ out_item:                           general_expression
                                     ;
 comp_statement:                     T_LBRACE decl_statements T_RBRACE
                                     ;
-main_function:                      main_header T_LBRACE decl_statements T_RBRACE
+main_function:                      main_header
+                                    T_LBRACE decl_statements T_RBRACE                           {hashtbl_get(hashtbl, scope); scope--;}
                                     ;
-main_header:                        T_INP T_MAIN T_LPAREN T_RPAREN
+main_header:                        T_INP T_MAIN T_LPAREN T_RPAREN                              {scope++;}
                                     ;
 
 %%
@@ -339,23 +355,33 @@ void yyerror (char *s, int error_distinction){
 }
 
 int main(int argc, char *args[]){
-  if(argc > 1){
+
+    /* CREATE HASHTABLE HERE, use the existing function */
+
+    if(argc > 1){
       yyin = fopen(args[1], "r");
-  }
-  else{
+      if(yyin == NULL){
+          printf("Error opening file !\n");
+          return -1;
+      }
+    }
+    else{
       yyin = stdin;
-  }
+    }
 
-  /* while(yylex() != T_EOF){}
-  printf("Read %d Lines\n", linecount);
-  printf("Recognized %d Lectical Units\n", tokencount); */
+    /* while(yylex() != T_EOF){}
+    printf("Read %d Lines\n", linecount);
+    printf("Recognized %d Lectical Units\n", tokencount); */
 
-  do {
+    do {
       yyparse();
-  } while(!feof(yyin));
+    } while(!feof(yyin));
 
-  return 0;
-  /* old part of yyerror  if(errorcount <= 5){
+    hashtbl_get(hashtbl, score); //scope 0 hashtbl
+    hashtbl_destroy(hashtbl); //free the mem of hashtbl
+
+    return 0;
+    /* old part of yyerror  if(errorcount <= 5){
         em[errorcount-1].form = strdup(print_expr);
         em[errorcount-1].current_line = linecount;
         em[errorcount-1].message = strdup(s);
@@ -371,5 +397,4 @@ int main(int argc, char *args[]){
         }
         yyterminate();
       } */
-
 }
