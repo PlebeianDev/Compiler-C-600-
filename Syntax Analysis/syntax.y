@@ -11,6 +11,9 @@
     HASHTBL *hashtbl;
 %}
 
+/* Error handling starts from the bottom, else causes red/red conflicts */
+%error-verbose
+
 %union{
     int ival;
     double dval;
@@ -41,6 +44,10 @@
 %left T_ADDOP
 %left T_MULOP
 %right T_SIZEOP T_NOTOP
+
+/* Use of fake token to resolve dangling else as in lab-example*/
+%nonassoc LOWER_THAN_ELSE
+%nonassoc T_ELSE
 
 %type <strval> program global_declaration global_declarations typedef_declaration typename standard_type listspec dims dim enum_declaration
 %type <strval> enum_body id_list initializer init_value expression variable general_expression assignment expression_list constant listexpression
@@ -274,7 +281,7 @@ if_statement:                       T_IF T_LPAREN                               
                                     ;
 if_tail:                            T_ELSE                                                      {scope++;}
                                     statement                                                   {hashtbl_get(hashtbl, scope); scope--;}
-                                    | %empty {}
+                                    | %empty %prec LOWER_THAN_ELSE                              {}
                                     ;
 while_statement:                    T_WHILE T_LPAREN                                            {scope++;}
                                     general_expression T_RPAREN statement                       {hashtbl_get(hashtbl, scope); scope--;}
@@ -312,7 +319,9 @@ single_casestatement:               T_CASE constant T_COLON single_casestatement
 return_statement:                   T_RETURN optexpr T_SEMI
                                     ;
 io_statement:                       T_CIN T_INP in_list T_SEMI
+                                    | T_CIN T_INP in_list error                                 {/*+ yyerror msg*/ yyerrok;}
                                     | T_COUT T_OUT out_list T_SEMI
+                                    | T_COUT T_OUT out_list error                               {/*+ yyerror msg*/ yyerrok;}
                                     ;
 in_list:                            in_list T_INP in_item
                                     | in_item
@@ -330,6 +339,8 @@ main_function:                      main_header
                                     T_LBRACE decl_statements T_RBRACE                           {hashtbl_get(hashtbl, scope); scope--;}
                                     ;
 main_header:                        T_INP T_MAIN T_LPAREN T_RPAREN                              {scope++;}
+                                    | T_INP T_MAIN error T_RPAREN                               {/*yyerror*/ yyerrok;}
+                                    | T_INP T_MAIN T_LPAREN error                               {/*yyerror*/ yyerrok;}
                                     ;
 
 %%
@@ -356,7 +367,11 @@ void yyerror (char *s, int error_distinction){
 
 int main(int argc, char *args[]){
 
-    /* CREATE HASHTABLE HERE, use the existing function */
+    hashtbl = hashtbl_create(10, NULL);
+    if(!hashtbl){
+        printf("Error creating hashtable!\n")
+        exit(EXIT_FAILURE);
+    }
 
     if(argc > 1){
       yyin = fopen(args[1], "r");

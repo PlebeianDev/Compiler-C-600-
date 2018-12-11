@@ -105,7 +105,8 @@ extern int yydebug;
     T_INP = 315,
     T_OUT = 316,
     T_ID = 317,
-    T_LISTFUNC = 318
+    T_LISTFUNC = 318,
+    LOWER_THAN_ELSE = 319
   };
 #endif
 
@@ -114,13 +115,13 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 14 "syntax.y" /* yacc.c:1909  */
+#line 17 "syntax.y" /* yacc.c:1909  */
 
     int ival;
     double dval;
     char* strval;
 
-#line 124 "syntax.tab.h" /* yacc.c:1909  */
+#line 125 "syntax.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
