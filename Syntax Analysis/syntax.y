@@ -296,6 +296,8 @@ switch_statement:                   T_SWITCH T_LPAREN                           
                                     general_expression T_RPAREN switch_tail                     {hashtbl_get(hashtbl, scope); scope--;}
                                     ;
 switch_tail:                        T_LBRACE decl_cases T_RBRACE
+                                    | error decl_cases T_RBRACE                                 {/*yyerror*/ yyerrok;}
+                                    | T_LBRACE decl_cases error                                 {/*yyerror*/ yyerrok;}
                                     | single_casestatement
                                     ;
 decl_cases:                         declarations casestatements
@@ -317,6 +319,7 @@ single_casestatement:               T_CASE constant T_COLON single_casestatement
                                     statement                                                   {hashtbl_get(hashtbl, scope); scope--;}
                                     ;
 return_statement:                   T_RETURN optexpr T_SEMI
+                                    | T_RETURN optexpr error                                    {/*yyerror*/ yyerrok;}
                                     ;
 io_statement:                       T_CIN T_INP in_list T_SEMI
                                     | T_CIN T_INP in_list error                                 {/*+ yyerror msg*/ yyerrok;}
@@ -337,6 +340,8 @@ comp_statement:                     T_LBRACE decl_statements T_RBRACE
                                     ;
 main_function:                      main_header
                                     T_LBRACE decl_statements T_RBRACE                           {hashtbl_get(hashtbl, scope); scope--;}
+                                    | error decl_statements T_RBRACE                            {/*yyerror*/ yyerrok;}
+                                    | T_LBRACE decl_statements error                            {/*yyerror*/ yyerrok;}
                                     ;
 main_header:                        T_INP T_MAIN T_LPAREN T_RPAREN                              {scope++;}
                                     | T_INP T_MAIN error T_RPAREN                               {/*yyerror*/ yyerrok;}
