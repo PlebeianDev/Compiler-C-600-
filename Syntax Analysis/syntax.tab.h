@@ -112,10 +112,10 @@ extern int yydebug;
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-
+#line 29 "syntax.y" /* yacc.c:1909  */
 union YYSTYPE
 {
-#line 17 "syntax.y" /* yacc.c:1909  */
+#line 29 "syntax.y" /* yacc.c:1909  */
 
     int ival;
     double dval;
@@ -123,7 +123,7 @@ union YYSTYPE
 
 #line 125 "syntax.tab.h" /* yacc.c:1909  */
 };
-
+#line 29 "syntax.y" /* yacc.c:1909  */
 typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1

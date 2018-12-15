@@ -64,17 +64,29 @@
 /* Copy the first part of user declarations.  */
 #line 2 "syntax.y" /* yacc.c:339  */
 
-    #include "C++600_headers.h"
+    //#include "C++600_headers.h"
     #include "hashtbl.h"
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <string.h>
+    #include <math.h>
+    #define STR_BUF	256
+    
     extern int yylex();
-    extern int yyparse();
+    extern char *yytext;
     extern FILE* yyin;
 
+    extern int linecount, tokencount, errorcount;
+    extern char buffer[STR_BUF], *buffer_ptr;
+
     /* Hashtable components */
+    
     int scope = 0;
+    int error_distinction = 0;
     HASHTBL *hashtbl;
 
-#line 78 "syntax.tab.c" /* yacc.c:339  */
+
+#line 90 "syntax.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -176,18 +188,18 @@ extern int yydebug;
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-
+#line 29 "syntax.y" /* yacc.c:355  */
 union YYSTYPE
 {
-#line 17 "syntax.y" /* yacc.c:355  */
+#line 29 "syntax.y" /* yacc.c:355  */
 
     int ival;
     double dval;
     char* strval;
 
-#line 189 "syntax.tab.c" /* yacc.c:355  */
+#line 201 "syntax.tab.c" /* yacc.c:355  */
 };
-
+#line 29 "syntax.y" /* yacc.c:355  */
 typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
@@ -202,7 +214,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 206 "syntax.tab.c" /* yacc.c:358  */
+#line 218 "syntax.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -505,27 +517,27 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    65,    65,    67,    68,    70,    71,    72,    73,    74,
-      75,    77,    77,    80,    81,    83,    84,    85,    86,    87,
-      89,    90,    92,    93,    95,    96,    98,    99,    98,   102,
-     104,   105,   105,   108,   109,   111,   112,   114,   115,   116,
-     117,   118,   119,   120,   121,   122,   123,   124,   125,   126,
-     127,   128,   129,   130,   131,   132,   134,   135,   136,   137,
-     138,   140,   141,   143,   144,   146,   147,   149,   150,   151,
-     152,   154,   156,   157,   159,   159,   163,   165,   166,   168,
-     169,   171,   172,   173,   174,   176,   177,   179,   180,   182,
-     184,   185,   187,   189,   190,   189,   193,   195,   196,   198,
-     200,   202,   203,   205,   207,   209,   210,   212,   213,   215,
-     217,   217,   221,   223,   224,   226,   228,   229,   231,   232,
-     233,   235,   236,   238,   240,   242,   243,   245,   246,   248,
-     250,   251,   252,   253,   255,   256,   258,   259,   261,   262,
-     264,   265,   266,   267,   268,   269,   270,   271,   272,   273,
-     274,   276,   278,   279,   278,   282,   282,   284,   286,   286,
-     289,   289,   292,   293,   295,   295,   298,   299,   300,   301,
-     303,   304,   305,   306,   308,   309,   311,   312,   312,   314,
-     314,   317,   318,   318,   321,   322,   324,   325,   326,   327,
-     329,   330,   332,   334,   335,   337,   339,   341,   343,   344,
-     346,   347,   348
+       0,    77,    77,    79,    80,    82,    83,    84,    85,    86,
+      87,    89,    89,    92,    93,    95,    96,    97,    98,    99,
+     101,   102,   104,   105,   107,   108,   110,   111,   110,   114,
+     116,   117,   117,   120,   121,   123,   124,   126,   127,   128,
+     129,   130,   131,   132,   133,   134,   135,   136,   137,   138,
+     139,   140,   141,   142,   143,   144,   146,   147,   148,   149,
+     150,   152,   153,   155,   156,   158,   159,   161,   162,   163,
+     164,   166,   168,   169,   171,   171,   175,   177,   178,   180,
+     181,   183,   184,   185,   186,   188,   189,   191,   192,   194,
+     196,   197,   199,   201,   202,   201,   205,   207,   208,   210,
+     212,   214,   215,   217,   219,   221,   222,   224,   225,   227,
+     229,   229,   233,   235,   236,   238,   240,   241,   243,   244,
+     245,   247,   248,   250,   252,   254,   255,   257,   258,   260,
+     262,   263,   264,   265,   267,   268,   270,   271,   273,   274,
+     276,   277,   278,   279,   280,   281,   282,   283,   284,   285,
+     286,   288,   290,   291,   290,   294,   294,   296,   298,   298,
+     301,   301,   304,   305,   307,   307,   310,   311,   312,   313,
+     315,   316,   317,   318,   320,   321,   323,   324,   324,   326,
+     326,   329,   330,   330,   333,   334,   336,   337,   338,   339,
+     341,   342,   344,   346,   347,   349,   351,   353,   355,   356,
+     358,   359,   360
 };
 #endif
 
@@ -1639,397 +1651,397 @@ yyreduce:
   switch (yyn)
     {
         case 4:
-#line 68 "syntax.y" /* yacc.c:1646  */
+#line 80 "syntax.y" /* yacc.c:1646  */
     {}
-#line 1645 "syntax.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 11:
-#line 77 "syntax.y" /* yacc.c:1646  */
-    {hashtbl_insert(hashtbl, (yyvsp[0].strval), NULL, scope); scope++;}
-#line 1651 "syntax.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 12:
-#line 78 "syntax.y" /* yacc.c:1646  */
-    {hashtbl_get(hashtbl, scope); scope--;}
 #line 1657 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 14:
-#line 81 "syntax.y" /* yacc.c:1646  */
-    {hashtbl_insert(hashtbl, (yyvsp[0].strval), NULL, scope);}
+  case 11:
+#line 89 "syntax.y" /* yacc.c:1646  */
+    {hashtbl_insert(hashtbl, (yyvsp[0].strval), NULL, scope); scope++;}
 #line 1663 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 21:
+  case 12:
 #line 90 "syntax.y" /* yacc.c:1646  */
-    {}
+    {hashtbl_get(hashtbl, scope); scope--;}
 #line 1669 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 23:
+  case 14:
 #line 93 "syntax.y" /* yacc.c:1646  */
-    {}
+    {hashtbl_insert(hashtbl, (yyvsp[0].strval), NULL, scope);}
 #line 1675 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 26:
-#line 98 "syntax.y" /* yacc.c:1646  */
-    {hashtbl_insert(hashtbl, (yyvsp[0].strval), NULL, scope); scope++;}
+  case 21:
+#line 102 "syntax.y" /* yacc.c:1646  */
+    {}
 #line 1681 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 27:
-#line 99 "syntax.y" /* yacc.c:1646  */
-    {hashtbl_get(hashtbl, scope);scope--;}
+  case 23:
+#line 105 "syntax.y" /* yacc.c:1646  */
+    {}
 #line 1687 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 30:
-#line 104 "syntax.y" /* yacc.c:1646  */
-    {hashtbl_insert(hashtbl, (yyvsp[-1].strval), NULL, scope);}
+  case 26:
+#line 110 "syntax.y" /* yacc.c:1646  */
+    {hashtbl_insert(hashtbl, (yyvsp[0].strval), NULL, scope); scope++;}
 #line 1693 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 31:
-#line 105 "syntax.y" /* yacc.c:1646  */
-    {hashtbl_insert(hashtbl, (yyvsp[0].strval), NULL, scope);}
+  case 27:
+#line 111 "syntax.y" /* yacc.c:1646  */
+    {hashtbl_get(hashtbl, scope);scope--;}
 #line 1699 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 34:
-#line 109 "syntax.y" /* yacc.c:1646  */
-    {}
+  case 30:
+#line 116 "syntax.y" /* yacc.c:1646  */
+    {hashtbl_insert(hashtbl, (yyvsp[-1].strval), NULL, scope);}
 #line 1705 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 57:
-#line 135 "syntax.y" /* yacc.c:1646  */
+  case 31:
+#line 117 "syntax.y" /* yacc.c:1646  */
     {hashtbl_insert(hashtbl, (yyvsp[0].strval), NULL, scope);}
 #line 1711 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 59:
-#line 137 "syntax.y" /* yacc.c:1646  */
-    {hashtbl_insert(hashtbl, (yyvsp[0].strval), NULL, scope);}
+  case 34:
+#line 121 "syntax.y" /* yacc.c:1646  */
+    {}
 #line 1717 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 66:
+  case 57:
 #line 147 "syntax.y" /* yacc.c:1646  */
-    {}
+    {hashtbl_insert(hashtbl, (yyvsp[0].strval), NULL, scope);}
 #line 1723 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 74:
-#line 159 "syntax.y" /* yacc.c:1646  */
-    {hashtbl_insert(hashtbl, (yyvsp[0].strval), NULL, scope); scope++;}
+  case 59:
+#line 149 "syntax.y" /* yacc.c:1646  */
+    {hashtbl_insert(hashtbl, (yyvsp[0].strval), NULL, scope);}
 #line 1729 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 75:
-#line 161 "syntax.y" /* yacc.c:1646  */
-    {hashtbl_get(hashtbl, scope); scope--;}
+  case 66:
+#line 159 "syntax.y" /* yacc.c:1646  */
+    {}
 #line 1735 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 77:
-#line 165 "syntax.y" /* yacc.c:1646  */
-    {hashtbl_insert(hashtbl, (yyvsp[0].strval), NULL, scope);}
+  case 74:
+#line 171 "syntax.y" /* yacc.c:1646  */
+    {hashtbl_insert(hashtbl, (yyvsp[0].strval), NULL, scope); scope++;}
 #line 1741 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 78:
-#line 166 "syntax.y" /* yacc.c:1646  */
-    {}
+  case 75:
+#line 173 "syntax.y" /* yacc.c:1646  */
+    {hashtbl_get(hashtbl, scope); scope--;}
 #line 1747 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 84:
-#line 174 "syntax.y" /* yacc.c:1646  */
-    {}
+  case 77:
+#line 177 "syntax.y" /* yacc.c:1646  */
+    {hashtbl_insert(hashtbl, (yyvsp[0].strval), NULL, scope);}
 #line 1753 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 92:
-#line 187 "syntax.y" /* yacc.c:1646  */
-    {hashtbl_insert(hashtbl, (yyvsp[-1].strval), NULL, scope);}
+  case 78:
+#line 178 "syntax.y" /* yacc.c:1646  */
+    {}
 #line 1759 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 93:
-#line 189 "syntax.y" /* yacc.c:1646  */
-    {scope++;}
+  case 84:
+#line 186 "syntax.y" /* yacc.c:1646  */
+    {}
 #line 1765 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 94:
-#line 190 "syntax.y" /* yacc.c:1646  */
-    {hashtbl_get(hashtbl, scope); scope--;}
+  case 92:
+#line 199 "syntax.y" /* yacc.c:1646  */
+    {hashtbl_insert(hashtbl, (yyvsp[-1].strval), NULL, scope);}
 #line 1771 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 101:
-#line 202 "syntax.y" /* yacc.c:1646  */
-    {hashtbl_get(hashtbl, scope); scope--;}
+  case 93:
+#line 201 "syntax.y" /* yacc.c:1646  */
+    {scope++;}
 #line 1777 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 102:
-#line 203 "syntax.y" /* yacc.c:1646  */
+  case 94:
+#line 202 "syntax.y" /* yacc.c:1646  */
     {hashtbl_get(hashtbl, scope); scope--;}
 #line 1783 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 104:
-#line 207 "syntax.y" /* yacc.c:1646  */
-    {hashtbl_insert(hashtbl, (yyvsp[0].strval), NULL, scope); scope++;}
+  case 101:
+#line 214 "syntax.y" /* yacc.c:1646  */
+    {hashtbl_get(hashtbl, scope); scope--;}
 #line 1789 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 110:
-#line 217 "syntax.y" /* yacc.c:1646  */
-    {hashtbl_insert(hashtbl, (yyvsp[0].strval), NULL, scope); scope++;}
+  case 102:
+#line 215 "syntax.y" /* yacc.c:1646  */
+    {hashtbl_get(hashtbl, scope); scope--;}
 #line 1795 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 111:
+  case 104:
 #line 219 "syntax.y" /* yacc.c:1646  */
-    {hashtbl_get(hashtbl, scope); scope--;}
+    {hashtbl_insert(hashtbl, (yyvsp[0].strval), NULL, scope); scope++;}
 #line 1801 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 118:
-#line 231 "syntax.y" /* yacc.c:1646  */
-    {hashtbl_get(hashtbl, scope); scope--;}
+  case 110:
+#line 229 "syntax.y" /* yacc.c:1646  */
+    {hashtbl_insert(hashtbl, (yyvsp[0].strval), NULL, scope); scope++;}
 #line 1807 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 119:
-#line 232 "syntax.y" /* yacc.c:1646  */
+  case 111:
+#line 231 "syntax.y" /* yacc.c:1646  */
     {hashtbl_get(hashtbl, scope); scope--;}
 #line 1813 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 120:
-#line 233 "syntax.y" /* yacc.c:1646  */
+  case 118:
+#line 243 "syntax.y" /* yacc.c:1646  */
     {hashtbl_get(hashtbl, scope); scope--;}
 #line 1819 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 123:
-#line 238 "syntax.y" /* yacc.c:1646  */
-    {hashtbl_insert(hashtbl, (yyvsp[0].strval), NULL, scope); scope++;}
+  case 119:
+#line 244 "syntax.y" /* yacc.c:1646  */
+    {hashtbl_get(hashtbl, scope); scope--;}
 #line 1825 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 124:
-#line 240 "syntax.y" /* yacc.c:1646  */
-    {hashtbl_insert(hashtbl, (yyvsp[-1].strval), NULL, scope);}
+  case 120:
+#line 245 "syntax.y" /* yacc.c:1646  */
+    {hashtbl_get(hashtbl, scope); scope--;}
 #line 1831 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 128:
-#line 246 "syntax.y" /* yacc.c:1646  */
-    {hashtbl_insert(hashtbl, (yyvsp[0].strval), NULL, scope);}
+  case 123:
+#line 250 "syntax.y" /* yacc.c:1646  */
+    {hashtbl_insert(hashtbl, (yyvsp[0].strval), NULL, scope); scope++;}
 #line 1837 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 133:
-#line 253 "syntax.y" /* yacc.c:1646  */
-    {}
+  case 124:
+#line 252 "syntax.y" /* yacc.c:1646  */
+    {hashtbl_insert(hashtbl, (yyvsp[-1].strval), NULL, scope);}
 #line 1843 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 137:
-#line 259 "syntax.y" /* yacc.c:1646  */
-    {}
+  case 128:
+#line 258 "syntax.y" /* yacc.c:1646  */
+    {hashtbl_insert(hashtbl, (yyvsp[0].strval), NULL, scope);}
 #line 1849 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 152:
-#line 278 "syntax.y" /* yacc.c:1646  */
-    {scope++;}
+  case 133:
+#line 265 "syntax.y" /* yacc.c:1646  */
+    {}
 #line 1855 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 153:
-#line 279 "syntax.y" /* yacc.c:1646  */
-    {hashtbl_get(hashtbl, scope); scope--;}
+  case 137:
+#line 271 "syntax.y" /* yacc.c:1646  */
+    {}
 #line 1861 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 155:
-#line 282 "syntax.y" /* yacc.c:1646  */
+  case 152:
+#line 290 "syntax.y" /* yacc.c:1646  */
     {scope++;}
 #line 1867 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 156:
-#line 283 "syntax.y" /* yacc.c:1646  */
+  case 153:
+#line 291 "syntax.y" /* yacc.c:1646  */
     {hashtbl_get(hashtbl, scope); scope--;}
 #line 1873 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 157:
-#line 284 "syntax.y" /* yacc.c:1646  */
-    {}
+  case 155:
+#line 294 "syntax.y" /* yacc.c:1646  */
+    {scope++;}
 #line 1879 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 158:
-#line 286 "syntax.y" /* yacc.c:1646  */
-    {scope++;}
+  case 156:
+#line 295 "syntax.y" /* yacc.c:1646  */
+    {hashtbl_get(hashtbl, scope); scope--;}
 #line 1885 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 159:
-#line 287 "syntax.y" /* yacc.c:1646  */
-    {hashtbl_get(hashtbl, scope); scope--;}
+  case 157:
+#line 296 "syntax.y" /* yacc.c:1646  */
+    {}
 #line 1891 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 160:
-#line 289 "syntax.y" /* yacc.c:1646  */
+  case 158:
+#line 298 "syntax.y" /* yacc.c:1646  */
     {scope++;}
 #line 1897 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 161:
-#line 290 "syntax.y" /* yacc.c:1646  */
+  case 159:
+#line 299 "syntax.y" /* yacc.c:1646  */
     {hashtbl_get(hashtbl, scope); scope--;}
 #line 1903 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 163:
-#line 293 "syntax.y" /* yacc.c:1646  */
-    {}
+  case 160:
+#line 301 "syntax.y" /* yacc.c:1646  */
+    {scope++;}
 #line 1909 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 164:
-#line 295 "syntax.y" /* yacc.c:1646  */
-    {scope++;}
+  case 161:
+#line 302 "syntax.y" /* yacc.c:1646  */
+    {hashtbl_get(hashtbl, scope); scope--;}
 #line 1915 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 165:
-#line 296 "syntax.y" /* yacc.c:1646  */
-    {hashtbl_get(hashtbl, scope); scope--;}
+  case 163:
+#line 305 "syntax.y" /* yacc.c:1646  */
+    {}
 #line 1921 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 167:
-#line 299 "syntax.y" /* yacc.c:1646  */
-    {/*yyerror*/ yyerrok;}
+  case 164:
+#line 307 "syntax.y" /* yacc.c:1646  */
+    {scope++;}
 #line 1927 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 168:
-#line 300 "syntax.y" /* yacc.c:1646  */
-    {/*yyerror*/ yyerrok;}
+  case 165:
+#line 308 "syntax.y" /* yacc.c:1646  */
+    {hashtbl_get(hashtbl, scope); scope--;}
 #line 1933 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 173:
-#line 306 "syntax.y" /* yacc.c:1646  */
-    {}
+  case 167:
+#line 311 "syntax.y" /* yacc.c:1646  */
+    {error_distinction = 2; yyerror("Missing {"); yyerrok;}
 #line 1939 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 177:
+  case 168:
 #line 312 "syntax.y" /* yacc.c:1646  */
-    {scope++;}
+    {error_distinction = 2; yyerror("Missing }"); yyerrok;}
 #line 1945 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 178:
-#line 313 "syntax.y" /* yacc.c:1646  */
-    {hashtbl_get(hashtbl, scope); scope--;}
+  case 173:
+#line 318 "syntax.y" /* yacc.c:1646  */
+    {}
 #line 1951 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 179:
-#line 314 "syntax.y" /* yacc.c:1646  */
+  case 177:
+#line 324 "syntax.y" /* yacc.c:1646  */
     {scope++;}
 #line 1957 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 180:
-#line 315 "syntax.y" /* yacc.c:1646  */
+  case 178:
+#line 325 "syntax.y" /* yacc.c:1646  */
     {hashtbl_get(hashtbl, scope); scope--;}
 #line 1963 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 182:
-#line 318 "syntax.y" /* yacc.c:1646  */
+  case 179:
+#line 326 "syntax.y" /* yacc.c:1646  */
     {scope++;}
 #line 1969 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 183:
-#line 319 "syntax.y" /* yacc.c:1646  */
+  case 180:
+#line 327 "syntax.y" /* yacc.c:1646  */
     {hashtbl_get(hashtbl, scope); scope--;}
 #line 1975 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 185:
-#line 322 "syntax.y" /* yacc.c:1646  */
-    {/*yyerror*/ yyerrok;}
+  case 182:
+#line 330 "syntax.y" /* yacc.c:1646  */
+    {scope++;}
 #line 1981 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 187:
-#line 325 "syntax.y" /* yacc.c:1646  */
-    {/*+ yyerror msg*/ yyerrok;}
+  case 183:
+#line 331 "syntax.y" /* yacc.c:1646  */
+    {hashtbl_get(hashtbl, scope); scope--;}
 #line 1987 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 189:
-#line 327 "syntax.y" /* yacc.c:1646  */
-    {/*+ yyerror msg*/ yyerrok;}
+  case 185:
+#line 334 "syntax.y" /* yacc.c:1646  */
+    {error_distinction = 2; yyerror("Missing ;"); yyerrok;}
 #line 1993 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 197:
-#line 342 "syntax.y" /* yacc.c:1646  */
-    {hashtbl_get(hashtbl, scope); scope--;}
+  case 187:
+#line 337 "syntax.y" /* yacc.c:1646  */
+    {error_distinction = 2; yyerror("Missing ;"); yyerrok;}
 #line 1999 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 198:
-#line 343 "syntax.y" /* yacc.c:1646  */
-    {/*yyerror*/ yyerrok;}
+  case 189:
+#line 339 "syntax.y" /* yacc.c:1646  */
+    {error_distinction = 2; yyerror("Missing ;"); yyerrok;}
 #line 2005 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 199:
-#line 344 "syntax.y" /* yacc.c:1646  */
-    {/*yyerror*/ yyerrok;}
+  case 197:
+#line 354 "syntax.y" /* yacc.c:1646  */
+    {hashtbl_get(hashtbl, scope); scope--;}
 #line 2011 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 200:
-#line 346 "syntax.y" /* yacc.c:1646  */
-    {scope++;}
+  case 198:
+#line 355 "syntax.y" /* yacc.c:1646  */
+    {error_distinction = 2; yyerror("Missing {"); yyerrok;}
 #line 2017 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 201:
-#line 347 "syntax.y" /* yacc.c:1646  */
-    {/*yyerror*/ yyerrok;}
+  case 199:
+#line 356 "syntax.y" /* yacc.c:1646  */
+    {error_distinction = 2; yyerror("Missing }"); yyerrok;}
 #line 2023 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
-  case 202:
-#line 348 "syntax.y" /* yacc.c:1646  */
-    {/*yyerror*/ yyerrok;}
+  case 200:
+#line 358 "syntax.y" /* yacc.c:1646  */
+    {scope++;}
 #line 2029 "syntax.tab.c" /* yacc.c:1646  */
     break;
 
+  case 201:
+#line 359 "syntax.y" /* yacc.c:1646  */
+    {error_distinction = 2; yyerror("Missing ("); yyerrok;}
+#line 2035 "syntax.tab.c" /* yacc.c:1646  */
+    break;
 
-#line 2033 "syntax.tab.c" /* yacc.c:1646  */
+  case 202:
+#line 360 "syntax.y" /* yacc.c:1646  */
+    {error_distinction = 2; yyerror("Missing )"); yyerrok;}
+#line 2041 "syntax.tab.c" /* yacc.c:1646  */
+    break;
+
+
+#line 2045 "syntax.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2257,21 +2269,23 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 351 "syntax.y" /* yacc.c:1906  */
+#line 363 "syntax.y" /* yacc.c:1906  */
 
 
 /*-----     USER FUNCTIONS    -----*/
 
-void yyerror (char *s, int error_distinction){
+void yyerror (char *s){
     errorcount++;
     if(error_distinction == 1){// an unrecognizable character.
 		printf("Error in l.%d | Token #%d \033[1;31m %s: %s\n \033[0m \n", linecount, tokencount+errorcount, yytext, s);
+        error_distinction = 0;
     }else if(error_distinction == 0){// unacceptable characters in strings.
 		*buffer_ptr = '\0';   // terminate the error causing string so you can print it.
         printf("Error in l.%d | Token #%d \033[1;31m \"%s\": %s\n \033[0m \n", linecount, tokencount+errorcount, buffer, s);
 	}
     else{// premature end for comments; mainly for multiline comments;
         printf("Error in l.%d |\033[1;31m %s \033[0m \n", linecount, s);
+        error_distinction = 0;
     }
     /* if(MAX_ERRORS <= 0) return; */
     if(errorcount == 5){
@@ -2284,7 +2298,7 @@ int main(int argc, char *args[]){
 
     hashtbl = hashtbl_create(10, NULL);
     if(!hashtbl){
-        printf("Error creating hashtable!\n")
+        printf("Error creating hashtable!\n"); 
         exit(EXIT_FAILURE);
     }
 
@@ -2299,32 +2313,12 @@ int main(int argc, char *args[]){
       yyin = stdin;
     }
 
-    /* while(yylex() != T_EOF){}
-    printf("Read %d Lines\n", linecount);
-    printf("Recognized %d Lectical Units\n", tokencount); */
-
     do {
       yyparse();
     } while(!feof(yyin));
 
-    hashtbl_get(hashtbl, score); //scope 0 hashtbl
+    hashtbl_get(hashtbl, scope); //scope 0 hashtbl
     hashtbl_destroy(hashtbl); //free the mem of hashtbl
 
     return 0;
-    /* old part of yyerror  if(errorcount <= 5){
-        em[errorcount-1].form = strdup(print_expr);
-        em[errorcount-1].current_line = linecount;
-        em[errorcount-1].message = strdup(s);
-        em[errorcount-1].current_tokencount = tokencount+errorcount;
-        em[errorcount-1].current_token = strdup(yytext);
-        if(flag == 1)
-          yyless(yyleng-1);
-      }
-      else if(errorcount > 5){
-        printf("\n-----------------------------------------------\n");
-        for(i = 0; i < errorcount; i++){
-          printf(em[i].form, em[i].current_line, em[i].current_tokencount, em[i].message, em[i].current_token);
-        }
-        yyterminate();
-      } */
 }

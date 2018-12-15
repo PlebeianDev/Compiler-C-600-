@@ -1,7 +1,13 @@
 /* Definition Section */
 
 %{
-#include "C++600_headers.h"
+//#include "C++600_headers.h"
+#include "syntax.tab.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#define STR_BUF 256
 /*
 struct error_history{
   char *form;
@@ -22,7 +28,16 @@ char buffer[STR_BUF];
 char* buffer_ptr;
 YYSTYPE yylval;
 
-extern void yyerror (char *s, int error_distinction);
+extern int error_distinction;
+extern void yyerror (char *s);
+int dectoInt(char *s);
+int hextoInt(char *s);
+int octtoInt(char *s);
+int bintoInt(char *s);
+double dectoReal(char *s);
+double hextoReal(char *s);
+double octtoReal(char *s);
+double bintoReal(char *s);
 %}
 
 %option case-insensitive
@@ -141,17 +156,17 @@ whitespace                                                                      
 <COMMENT>"*/"                                                                   {BEGIN(INITIAL);}
 <COMMENT>"\n"                                                                   {++linecount;}
 <COMMENT>.                                                                      {/* this part is ignored */}
-<COMMENT><<EOF>>                                                                {yyerror("fatal error: MULTI LINE COMMENT ERROR\n", 2);yyterminate();}
+<COMMENT><<EOF>>                                                                {error_distinction = 2; yyerror("fatal error: MULTI LINE COMMENT ERROR\n");yyterminate();}
 
 "//"                                                                            {BEGIN(LINE_COMMENT);}
 <LINE_COMMENT>"\n"                                                              {++linecount; BEGIN(INITIAL);}
 <LINE_COMMENT>.																	{}
-<LINE_COMMENT><<EOF>>                                                           {yyerror("fatal error: LINE COMMENT ERROR\n", 2);yyterminate(); /* since it can't continue if it is not terminated*/}
+<LINE_COMMENT><<EOF>>                                                           {error_distinction = 2; yyerror("fatal error: LINE COMMENT ERROR\n");yyterminate(); /* since it can't continue if it is not terminated*/}
 
  /* SCONST */;
 \"                                                                              {BEGIN(STRING); buffer_ptr = buffer;}
 <STRING>\"                                                                      {BEGIN(INITIAL); *buffer_ptr = '\0'; ++tokencount; printf("Line %d --> TOKEN SCONST: %s | TOKEN #%d\n", linecount, buffer, tokencount);yylval.strval = strdup(buffer); return(T_SCONST);}
-<STRING>\n                                                                      {yyerror("fatal error: illegal linefeed in string", 0);yyterminate();}
+<STRING>\n                                                                      {yyerror("fatal error: illegal linefeed in string");yyterminate();}
 <STRING>\\n                                                                     {*buffer_ptr = '\n'; *buffer_ptr++;}
 <STRING>\\f                                                                     {*buffer_ptr = '\f'; *buffer_ptr++;}
 <STRING>\\t                                                                     {*buffer_ptr = '\t'; *buffer_ptr++;}
@@ -163,12 +178,12 @@ whitespace                                                                      
 <STRING>\\\n                                                                    {linecount++;}
 <STRING>\\{alnum}?                                                              {*buffer_ptr = yytext[1]; *buffer_ptr++;}
 <STRING>.                                                                       {char *token_index = yytext; while (*token_index){ *buffer_ptr = *token_index; *buffer_ptr++; *token_index++;}}
-<STRING><<EOF>>                                                                 {yyerror("fatal error: missing \"\t", 0);yyterminate();}
+<STRING><<EOF>>                                                                 {error_distinction = 0; yyerror("fatal error: missing \"\t");yyterminate();}
 
 <<EOF>>										                                    {printf("\n\033[1;33mAnalyzer Finished! \033[0m\n");return(T_EOF);}
 {whitespace}*                                                                   {}
 \n										                                        {++linecount;}
-.                                                                               {yyerror("Invalid token", 1); yyless(1); /*since we want to reenter the token, without the character who is causing the error*/}
+.                                                                               {error_distinction = 1; yyerror("Invalid token"); yyless(1); /*since we want to reenter the token, without the character who is causing the error*/}
 %%
 
  /* to be remade */

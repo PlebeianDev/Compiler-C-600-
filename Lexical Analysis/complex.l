@@ -23,6 +23,16 @@ char* buffer_ptr;
 YYSTYPE yylval;
 %}
 
+int dectoInt(char *s);
+int hextoInt(char *s);
+int octtoInt(char *s);
+int bintoInt(char *s);
+double dectoReal(char *s);
+double hextoReal(char *s);
+double octtoReal(char *s);
+double bintoReal(char *s);
+%}
+
 %option case-insensitive
 
 digit                                                                           [0-9]
@@ -139,17 +149,17 @@ whitespace                                                                      
 <COMMENT>"*/"                                                                   {BEGIN(INITIAL);}
 <COMMENT>"\n"                                                                   {++linecount;}
 <COMMENT>.                                                                      {/* this part is ignored */}
-<COMMENT><<EOF>>                                                                {yyerror("fatal error: MULTI LINE COMMENT ERROR\n", 2);yyterminate();}
+<COMMENT><<EOF>>                                                                {error_distinction = 2; yyerror("fatal error: MULTI LINE COMMENT ERROR\n");yyterminate();}
 
 "//"                                                                            {BEGIN(LINE_COMMENT);}
 <LINE_COMMENT>"\n"                                                              {++linecount; BEGIN(INITIAL);}
 <LINE_COMMENT>.																	{}
-<LINE_COMMENT><<EOF>>                                                           {yyerror("fatal error: LINE COMMENT ERROR\n", 2);yyterminate(); /* since it can't continue if it is not terminated*/}
+<LINE_COMMENT><<EOF>>                                                           {error_distinction = 2; yyerror("fatal error: LINE COMMENT ERROR\n");yyterminate(); /* since it can't continue if it is not terminated*/}
 
  /* SCONST */;
 \"                                                                              {BEGIN(STRING); buffer_ptr = buffer;}
 <STRING>\"                                                                      {BEGIN(INITIAL); *buffer_ptr = '\0'; ++tokencount; printf("Line %d --> TOKEN SCONST: %s | TOKEN #%d\n", linecount, buffer, tokencount);yylval.strval = strdup(buffer); return(T_SCONST);}
-<STRING>\n                                                                      {yyerror("fatal error: illegal linefeed in string", 0);yyterminate();}
+<STRING>\n                                                                      {yyerror("fatal error: illegal linefeed in string");yyterminate();}
 <STRING>\\n                                                                     {*buffer_ptr = '\n'; *buffer_ptr++;}
 <STRING>\\f                                                                     {*buffer_ptr = '\f'; *buffer_ptr++;}
 <STRING>\\t                                                                     {*buffer_ptr = '\t'; *buffer_ptr++;}
@@ -161,32 +171,15 @@ whitespace                                                                      
 <STRING>\\\n                                                                    {linecount++;}
 <STRING>\\{alnum}?                                                              {*buffer_ptr = yytext[1]; *buffer_ptr++;}
 <STRING>.                                                                       {char *token_index = yytext; while (*token_index){ *buffer_ptr = *token_index; *buffer_ptr++; *token_index++;}}
-<STRING><<EOF>>                                                                 {yyerror("fatal error: missing \"\t", 0);yyterminate();}
+<STRING><<EOF>>                                                                 {error_distinction = 0; yyerror("fatal error: missing \"\t");yyterminate();}
 
 <<EOF>>										                                    {printf("\n\033[1;33mAnalyzer Finished! \033[0m\n");return(T_EOF);}
 {whitespace}*                                                                   {}
 \n										                                        {++linecount;}
-.                                                                               {yyerror("Invalid token", 1); yyless(1); /*since we want to reenter the token, without the character who is causing the error*/}
+.                                                                               {error_distinction = 1; yyerror("Invalid token"); yyless(1); /*since we want to reenter the token, without the character who is causing the error*/}
 %%
 
  /* to be remade */
-void yyerror (char *s, int error_distinction){
-    errorcount++;
-    if(error_distinction == 1){// an unrecognizable character.
-		printf("Error in l.%d | Token #%d \033[1;31m %s: %s\n \033[0m \n", linecount, tokencount+errorcount, yytext, s);
-    }else if(error_distinction == 0){// unacceptable characters in strings.
-		*buffer_ptr = '\0';   // terminate the error causing string so you can print it.
-        printf("Error in l.%d | Token #%d \033[1;31m \"%s\": %s\n \033[0m \n", linecount, tokencount+errorcount, buffer, s);
-	}
-    else{// premature end for comments; mainly for multiline comments;
-        printf("Error in l.%d |\033[1;31m %s \033[0m \n", linecount, s);
-    }
-    /* if(MAX_ERRORS <= 0) return; */
-    if(errorcount == 5){
-        printf("Reached maximum number of errors! Exiting Analyzer\n");
-        exit(-1); // terminate the whole analyzing process;
-    }
-}
 
 int dectoInt(char *s){
 	int res;
@@ -262,35 +255,3 @@ double bintoReal(char *s){
 }
 
 int yywrap(){}
-
-int main(int argc, char *args[]){
-  if(argc > 1){
-      yyin = fopen(args[1], "r");
-  }
-  else{
-      yyin = stdin;
-  }
-
-  while(yylex() != T_EOF){}
-  printf("Read %d Lines\n", linecount);
-  printf("Recognized %d Lectical Units\n", tokencount);
-
-  return 0;
-  /* old part of yyerror  if(errorcount <= 5){
-        em[errorcount-1].form = strdup(print_expr);
-        em[errorcount-1].current_line = linecount;
-        em[errorcount-1].message = strdup(s);
-        em[errorcount-1].current_tokencount = tokencount+errorcount;
-        em[errorcount-1].current_token = strdup(yytext);
-        if(flag == 1)
-          yyless(yyleng-1);
-      }
-      else if(errorcount > 5){
-        printf("\n-----------------------------------------------\n");
-        for(i = 0; i < errorcount; i++){
-          printf(em[i].form, em[i].current_line, em[i].current_tokencount, em[i].message, em[i].current_token);
-        }
-        yyterminate();
-      } */
-
-}

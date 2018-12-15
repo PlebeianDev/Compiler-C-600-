@@ -1,24 +1,36 @@
 /*-----      STATEMENTS       -----*/
 %{
-    #include "C++600_headers.h"
+    //#include "C++600_headers.h"
     #include "hashtbl.h"
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <string.h>
+    #include <math.h>
+    #define STR_BUF	256
+    
     extern int yylex();
-    extern int yyparse();
+    extern char *yytext;
     extern FILE* yyin;
 
+    extern int linecount, tokencount, errorcount;
+    extern char buffer[STR_BUF], *buffer_ptr;
+
     /* Hashtable components */
+    
     int scope = 0;
+    int error_distinction = 0;
     HASHTBL *hashtbl;
+
 %}
 
 /* Error handling starts from the bottom, else causes red/red conflicts */
 %error-verbose
 
-%union{
+%union YYSTYPE{
     int ival;
     double dval;
     char* strval;
-}
+};
 
 %token<ival> T_ICONST
 %token<dval> T_FCONST
@@ -296,8 +308,8 @@ switch_statement:                   T_SWITCH T_LPAREN                           
                                     general_expression T_RPAREN switch_tail                     {hashtbl_get(hashtbl, scope); scope--;}
                                     ;
 switch_tail:                        T_LBRACE decl_cases T_RBRACE
-                                    | error decl_cases T_RBRACE                                 {/*yyerror*/ yyerrok;}
-                                    | T_LBRACE decl_cases error                                 {/*yyerror*/ yyerrok;}
+                                    | error decl_cases T_RBRACE                                 {error_distinction = 2; yyerror("Missing {"); yyerrok;}
+                                    | T_LBRACE decl_cases error                                 {error_distinction = 2; yyerror("Missing }"); yyerrok;}
                                     | single_casestatement
                                     ;
 decl_cases:                         declarations casestatements
@@ -319,12 +331,12 @@ single_casestatement:               T_CASE constant T_COLON single_casestatement
                                     statement                                                   {hashtbl_get(hashtbl, scope); scope--;}
                                     ;
 return_statement:                   T_RETURN optexpr T_SEMI
-                                    | T_RETURN optexpr error                                    {/*yyerror*/ yyerrok;}
+                                    | T_RETURN optexpr error                                    {error_distinction = 2; yyerror("Missing ;"); yyerrok;}
                                     ;
 io_statement:                       T_CIN T_INP in_list T_SEMI
-                                    | T_CIN T_INP in_list error                                 {/*+ yyerror msg*/ yyerrok;}
+                                    | T_CIN T_INP in_list error                                 {error_distinction = 2; yyerror("Missing ;"); yyerrok;}
                                     | T_COUT T_OUT out_list T_SEMI
-                                    | T_COUT T_OUT out_list error                               {/*+ yyerror msg*/ yyerrok;}
+                                    | T_COUT T_OUT out_list error                               {error_distinction = 2; yyerror("Missing ;"); yyerrok;}
                                     ;
 in_list:                            in_list T_INP in_item
                                     | in_item
@@ -340,28 +352,30 @@ comp_statement:                     T_LBRACE decl_statements T_RBRACE
                                     ;
 main_function:                      main_header
                                     T_LBRACE decl_statements T_RBRACE                           {hashtbl_get(hashtbl, scope); scope--;}
-                                    | error decl_statements T_RBRACE                            {/*yyerror*/ yyerrok;}
-                                    | T_LBRACE decl_statements error                            {/*yyerror*/ yyerrok;}
+                                    | error decl_statements T_RBRACE                            {error_distinction = 2; yyerror("Missing {"); yyerrok;}
+                                    | T_LBRACE decl_statements error                            {error_distinction = 2; yyerror("Missing }"); yyerrok;}
                                     ;
 main_header:                        T_INP T_MAIN T_LPAREN T_RPAREN                              {scope++;}
-                                    | T_INP T_MAIN error T_RPAREN                               {/*yyerror*/ yyerrok;}
-                                    | T_INP T_MAIN T_LPAREN error                               {/*yyerror*/ yyerrok;}
+                                    | T_INP T_MAIN error T_RPAREN                               {error_distinction = 2; yyerror("Missing ("); yyerrok;}
+                                    | T_INP T_MAIN T_LPAREN error                               {error_distinction = 2; yyerror("Missing )"); yyerrok;}
                                     ;
 
 %%
 
 /*-----     USER FUNCTIONS    -----*/
 
-void yyerror (char *s, int error_distinction){
+void yyerror (char *s){
     errorcount++;
     if(error_distinction == 1){// an unrecognizable character.
 		printf("Error in l.%d | Token #%d \033[1;31m %s: %s\n \033[0m \n", linecount, tokencount+errorcount, yytext, s);
+        error_distinction = 0;
     }else if(error_distinction == 0){// unacceptable characters in strings.
 		*buffer_ptr = '\0';   // terminate the error causing string so you can print it.
         printf("Error in l.%d | Token #%d \033[1;31m \"%s\": %s\n \033[0m \n", linecount, tokencount+errorcount, buffer, s);
 	}
     else{// premature end for comments; mainly for multiline comments;
         printf("Error in l.%d |\033[1;31m %s \033[0m \n", linecount, s);
+        error_distinction = 0;
     }
     /* if(MAX_ERRORS <= 0) return; */
     if(errorcount == 5){
@@ -374,7 +388,7 @@ int main(int argc, char *args[]){
 
     hashtbl = hashtbl_create(10, NULL);
     if(!hashtbl){
-        printf("Error creating hashtable!\n")
+        printf("Error creating hashtable!\n"); 
         exit(EXIT_FAILURE);
     }
 
@@ -389,32 +403,12 @@ int main(int argc, char *args[]){
       yyin = stdin;
     }
 
-    /* while(yylex() != T_EOF){}
-    printf("Read %d Lines\n", linecount);
-    printf("Recognized %d Lectical Units\n", tokencount); */
-
     do {
       yyparse();
     } while(!feof(yyin));
 
-    hashtbl_get(hashtbl, score); //scope 0 hashtbl
+    hashtbl_get(hashtbl, scope); //scope 0 hashtbl
     hashtbl_destroy(hashtbl); //free the mem of hashtbl
 
     return 0;
-    /* old part of yyerror  if(errorcount <= 5){
-        em[errorcount-1].form = strdup(print_expr);
-        em[errorcount-1].current_line = linecount;
-        em[errorcount-1].message = strdup(s);
-        em[errorcount-1].current_tokencount = tokencount+errorcount;
-        em[errorcount-1].current_token = strdup(yytext);
-        if(flag == 1)
-          yyless(yyleng-1);
-      }
-      else if(errorcount > 5){
-        printf("\n-----------------------------------------------\n");
-        for(i = 0; i < errorcount; i++){
-          printf(em[i].form, em[i].current_line, em[i].current_tokencount, em[i].message, em[i].current_token);
-        }
-        yyterminate();
-      } */
 }
