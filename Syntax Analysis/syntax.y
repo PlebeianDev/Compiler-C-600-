@@ -36,7 +36,7 @@
 %token<ival> T_ICONST
 %token<dval> T_FCONST
 %token<strval> T_CCONST T_SCONST
-%token<strval> T_EOF T_TYPEDEF T_CHAR T_INT T_FLOAT
+%token<strval> T_TYPEDEF T_CHAR T_INT T_FLOAT
 %token<strval> T_STRING T_CLASS T_PRIVATE T_PROTECTED T_PUBLIC
 %token<strval> T_VOID T_STATIC T_UNION T_ENUM T_LIST
 %token<strval> T_CONTINUE T_BREAK T_IF T_ELSE T_WHILE
@@ -48,6 +48,7 @@
 %token<strval> T_ASSIGN T_COLON T_LBRACK T_RBRACK T_REFER
 %token<strval> T_LBRACE T_RBRACE T_METH T_INP T_OUT
 %token<strval> T_ID T_LISTFUNC
+%token<strval> T_EOF 0
 
 %left T_COMMA
 %left T_OROP
@@ -356,9 +357,9 @@ main_function:                      main_header
                                     | error decl_statements T_RBRACE                            {error_distinction = 2; yyerror("Missing {"); yyerrok;}
                                     | T_LBRACE decl_statements error                            {error_distinction = 2; yyerror("Missing }"); yyerrok;}
                                     ;
-main_header:                        T_INP T_MAIN T_LPAREN T_RPAREN                              {scope++;}
-                                    | T_INP T_MAIN error T_RPAREN                               {error_distinction = 2; yyerror("Missing ("); yyerrok;}
-                                    | T_INP T_MAIN T_LPAREN error                               {error_distinction = 2; yyerror("Missing )"); yyerrok;}
+main_header:                        T_INT T_MAIN T_LPAREN T_RPAREN                              {scope++;}
+                                    | T_INT T_MAIN error T_RPAREN                               {error_distinction = 2; yyerror("Missing ("); yyerrok;}
+                                    | T_INT T_MAIN T_LPAREN error                               {error_distinction = 2; yyerror("Missing )"); yyerrok;}
                                     ;
 
 %%
@@ -407,6 +408,8 @@ int main(int argc, char *args[]){
     do {
       yyparse();
     } while(!feof(yyin));
+
+    printf("\n\033[1;33mAnalyzer Finished! \033[0m\n");
 
     hashtbl_get(hashtbl, scope); //scope 0 hashtbl
     hashtbl_destroy(hashtbl); //free the mem of hashtbl
