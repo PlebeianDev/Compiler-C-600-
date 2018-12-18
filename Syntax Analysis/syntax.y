@@ -21,6 +21,7 @@
     int error_distinction = 0;
     HASHTBL *hashtbl;
 
+    void yyerror (const char *s);
 %}
 
 /* Error handling starts from the bottom, else causes red/red conflicts */
@@ -364,7 +365,7 @@ main_header:                        T_INP T_MAIN T_LPAREN T_RPAREN              
 
 /*-----     USER FUNCTIONS    -----*/
 
-void yyerror (char *s){
+void yyerror (const char *s){
     errorcount++;
     if(error_distinction == 1){// an unrecognizable character.
 		printf("Error in l.%d | Token #%d \033[1;31m %s: %s\n \033[0m \n", linecount, tokencount+errorcount, yytext, s);

@@ -29,7 +29,7 @@ char* buffer_ptr;
 YYSTYPE yylval;
 
 extern int error_distinction;
-extern void yyerror (char *s);
+extern void yyerror (const char *s);
 int dectoInt(char *s);
 int hextoInt(char *s);
 int octtoInt(char *s);
@@ -64,7 +64,7 @@ whitespace                                                                      
 "char"                                                                          {++tokencount; printf("Line %d --> TOKEN CHAR: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_CHAR);}
 "int"                                                                           {++tokencount; printf("Line %d --> TOKEN INT: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_INT);}
 "float"                                                                         {++tokencount; printf("Line %d --> TOKEN FLOAT: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_FLOAT);}
-"str"                                                                           {++tokencount; printf("Line %d --> TOKEN STRING: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_STRING);}
+"string"                                                                        {++tokencount; printf("Line %d --> TOKEN STRING: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_STRING);}
 "class"                                                                         {++tokencount; printf("Line %d --> TOKEN CLASS: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_CLASS);}
 "private"                                                                       {++tokencount; printf("Line %d --> TOKEN PRIVATE: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_PRIVATE);}
 "protected"                                                                     {++tokencount; printf("Line %d --> TOKEN PROTECTED: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_PROTECTED);}
@@ -176,8 +176,8 @@ whitespace                                                                      
 <STRING>\\\\                                                                    {*buffer_ptr++ = '\\'; /* *buffer_ptr++; */}
 <STRING>\\\"                                                                    {*buffer_ptr++ = '"'; /* *buffer_ptr++; */}
 <STRING>\\\n                                                                    {linecount++;}
-<STRING>\\{alnum}?                                                              {*buffer_ptr++ = yytext[1]; /* *buffer_ptr++; */}
-<STRING>.                                                                       {char *token_index = yytext; while (*token_index){ *buffer_ptr++ = *token_index++; /* *buffer_ptr++; *token_index++; */ }}
+<STRING>\\({alnum}|_)?                                                          {*buffer_ptr++ = yytext[1]; /* *buffer_ptr++; */}
+<STRING>[^\\\n\"]+                                                              {char *token_index = yytext; while (*token_index){ *buffer_ptr++ = *token_index++; /* *buffer_ptr++; *token_index++; */ }}
 <STRING><<EOF>>                                                                 {error_distinction = 0; yyerror("fatal error: missing \"\t");yyterminate();}
 
 <<EOF>>										                                    {printf("\n\033[1;33mAnalyzer Finished! \033[0m\n");return(T_EOF);}
