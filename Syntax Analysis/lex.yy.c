@@ -1671,7 +1671,7 @@ YY_RULE_SETUP
 case 82:
 YY_RULE_SETUP
 #line 169 "complex.l"
-{BEGIN(INITIAL); *buffer_ptr = '\0'; ++tokencount; printf("Line %d --> TOKEN SCONST: %s | TOKEN #%d\n", linecount, buffer, tokencount);yylval.strval = strdup(buffer); return(T_SCONST);}
+{BEGIN(INITIAL); *buffer_ptr = '\0'; ++tokencount; printf("Line %d --> TOKEN SCONST: %s | TOKEN #%d\n", linecount, buffer, tokencount); /* yylval.strval = strdup(buffer); */ return(T_SCONST);}
 	YY_BREAK
 case 83:
 /* rule 83 can match eol */
@@ -1682,42 +1682,42 @@ YY_RULE_SETUP
 case 84:
 YY_RULE_SETUP
 #line 171 "complex.l"
-{*buffer_ptr = '\n'; *buffer_ptr++;}
+{*buffer_ptr++ = '\n'; /* *buffer_ptr++; */}
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
 #line 172 "complex.l"
-{*buffer_ptr = '\f'; *buffer_ptr++;}
+{*buffer_ptr++ = '\f'; /* *buffer_ptr++; */}
 	YY_BREAK
 case 86:
 YY_RULE_SETUP
 #line 173 "complex.l"
-{*buffer_ptr = '\t'; *buffer_ptr++;}
+{*buffer_ptr++ = '\t'; /* *buffer_ptr++; */}
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
 #line 174 "complex.l"
-{*buffer_ptr = '\r'; *buffer_ptr++;}
+{*buffer_ptr++ = '\r'; /* *buffer_ptr++; */}
 	YY_BREAK
 case 88:
 YY_RULE_SETUP
 #line 175 "complex.l"
-{*buffer_ptr = '\b'; *buffer_ptr++;}
+{*buffer_ptr++ = '\b'; /* *buffer_ptr++; */}
 	YY_BREAK
 case 89:
 YY_RULE_SETUP
 #line 176 "complex.l"
-{*buffer_ptr = '\v'; *buffer_ptr++;}
+{*buffer_ptr++ = '\v'; /* *buffer_ptr++; */}
 	YY_BREAK
 case 90:
 YY_RULE_SETUP
 #line 177 "complex.l"
-{*buffer_ptr = '\\'; *buffer_ptr++;}
+{*buffer_ptr++ = '\\'; /* *buffer_ptr++; */}
 	YY_BREAK
 case 91:
 YY_RULE_SETUP
 #line 178 "complex.l"
-{*buffer_ptr = '"'; *buffer_ptr++;}
+{*buffer_ptr++ = '"'; /* *buffer_ptr++; */}
 	YY_BREAK
 case 92:
 /* rule 92 can match eol */
@@ -1728,12 +1728,12 @@ YY_RULE_SETUP
 case 93:
 YY_RULE_SETUP
 #line 180 "complex.l"
-{*buffer_ptr = yytext[1]; *buffer_ptr++;}
+{*buffer_ptr++ = yytext[1]; /* *buffer_ptr++; */}
 	YY_BREAK
 case 94:
 YY_RULE_SETUP
 #line 181 "complex.l"
-{char *token_index = yytext; while (*token_index){ *buffer_ptr = *token_index; *buffer_ptr++; *token_index++;}}
+{char *token_index = yytext; while (*token_index){ *buffer_ptr++ = *token_index++; /* *buffer_ptr++; *token_index++; */ }}
 	YY_BREAK
 case YY_STATE_EOF(STRING):
 #line 182 "complex.l"

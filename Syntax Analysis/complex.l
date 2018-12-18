@@ -167,17 +167,17 @@ whitespace                                                                      
 \"                                                                              {BEGIN(STRING); buffer_ptr = buffer;}
 <STRING>\"                                                                      {BEGIN(INITIAL); *buffer_ptr = '\0'; ++tokencount; printf("Line %d --> TOKEN SCONST: %s | TOKEN #%d\n", linecount, buffer, tokencount);yylval.strval = strdup(buffer); return(T_SCONST);}
 <STRING>\n                                                                      {yyerror("fatal error: illegal linefeed in string");yyterminate();}
-<STRING>\\n                                                                     {*buffer_ptr = '\n'; *buffer_ptr++;}
-<STRING>\\f                                                                     {*buffer_ptr = '\f'; *buffer_ptr++;}
-<STRING>\\t                                                                     {*buffer_ptr = '\t'; *buffer_ptr++;}
-<STRING>\\r                                                                     {*buffer_ptr = '\r'; *buffer_ptr++;}
-<STRING>\\b                                                                     {*buffer_ptr = '\b'; *buffer_ptr++;}
-<STRING>\\v                                                                     {*buffer_ptr = '\v'; *buffer_ptr++;}
-<STRING>\\\\                                                                    {*buffer_ptr = '\\'; *buffer_ptr++;}
-<STRING>\\\"                                                                    {*buffer_ptr = '"'; *buffer_ptr++;}
+<STRING>\\n                                                                     {*buffer_ptr++ = '\n'; /* *buffer_ptr++; */}
+<STRING>\\f                                                                     {*buffer_ptr++ = '\f'; /* *buffer_ptr++; */}
+<STRING>\\t                                                                     {*buffer_ptr++ = '\t'; /* *buffer_ptr++; */}
+<STRING>\\r                                                                     {*buffer_ptr++ = '\r'; /* *buffer_ptr++; */}
+<STRING>\\b                                                                     {*buffer_ptr++ = '\b'; /* *buffer_ptr++; */}
+<STRING>\\v                                                                     {*buffer_ptr++ = '\v'; /* *buffer_ptr++; */}
+<STRING>\\\\                                                                    {*buffer_ptr++ = '\\'; /* *buffer_ptr++; */}
+<STRING>\\\"                                                                    {*buffer_ptr++ = '"'; /* *buffer_ptr++; */}
 <STRING>\\\n                                                                    {linecount++;}
-<STRING>\\{alnum}?                                                              {*buffer_ptr = yytext[1]; *buffer_ptr++;}
-<STRING>.                                                                       {char *token_index = yytext; while (*token_index){ *buffer_ptr = *token_index; *buffer_ptr++; *token_index++;}}
+<STRING>\\{alnum}?                                                              {*buffer_ptr++ = yytext[1]; /* *buffer_ptr++; */}
+<STRING>.                                                                       {char *token_index = yytext; while (*token_index){ *buffer_ptr++ = *token_index++; /* *buffer_ptr++; *token_index++; */ }}
 <STRING><<EOF>>                                                                 {error_distinction = 0; yyerror("fatal error: missing \"\t");yyterminate();}
 
 <<EOF>>										                                    {printf("\n\033[1;33mAnalyzer Finished! \033[0m\n");return(T_EOF);}

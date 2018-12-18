@@ -2320,5 +2320,6 @@ int main(int argc, char *args[]){
     hashtbl_get(hashtbl, scope); //scope 0 hashtbl
     hashtbl_destroy(hashtbl); //free the mem of hashtbl
 
+    fclose(yyin);
     return 0;
 }
