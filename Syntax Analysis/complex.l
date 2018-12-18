@@ -1,7 +1,13 @@
 /* Definition Section */
 
 %{
-#include "C++600_headers.h"
+//#include "C++600_headers.h"
+#include "syntax.tab.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#define STR_BUF 256
 /*
 struct error_history{
   char *form;
@@ -21,8 +27,9 @@ int errorcount = 0;
 char buffer[STR_BUF];
 char* buffer_ptr;
 YYSTYPE yylval;
-%}
 
+extern int error_distinction;
+extern void yyerror (const char *s);
 int dectoInt(char *s);
 int hextoInt(char *s);
 int octtoInt(char *s);
@@ -57,7 +64,7 @@ whitespace                                                                      
 "char"                                                                          {++tokencount; printf("Line %d --> TOKEN CHAR: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_CHAR);}
 "int"                                                                           {++tokencount; printf("Line %d --> TOKEN INT: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_INT);}
 "float"                                                                         {++tokencount; printf("Line %d --> TOKEN FLOAT: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_FLOAT);}
-"str"                                                                           {++tokencount; printf("Line %d --> TOKEN STRING: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_STRING);}
+"string"                                                                        {++tokencount; printf("Line %d --> TOKEN STRING: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_STRING);}
 "class"                                                                         {++tokencount; printf("Line %d --> TOKEN CLASS: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_CLASS);}
 "private"                                                                       {++tokencount; printf("Line %d --> TOKEN PRIVATE: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_PRIVATE);}
 "protected"                                                                     {++tokencount; printf("Line %d --> TOKEN PROTECTED: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_PROTECTED);}
@@ -95,7 +102,7 @@ whitespace                                                                      
  /* Floating point */
 0(x|X)([a-fA-F1-9]{hex}*)?[.]((0*[a-fA-F1-9]+{hex}*)|0)				            {++tokencount; printf("Line %d --> Hex_FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.dval = hextoReal(yytext);printf("TOKEN literal value: %.2lf\n", hextoReal(yytext));return(T_FCONST);}
 0(o|O)([1-7]{oct}*)?[.]((0*[1-7]+{oct}*)|0)                                     {++tokencount; printf("Line %d --> Oct_FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.dval = octtoReal(yytext);printf("TOKEN literal value: %.2lf\n", octtoReal(yytext));return(T_FCONST);}
-0(b|B)(1{bin}*)?[.]((0*1+{bin}*)|o)										     	{++tokencount; printf("Line %d --> Bin_FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.dval = bintoReal(yytext);printf("TOKEN literal value: %.2lf\n", bintoReal(yytext));return(T_FCONST);}
+0(b|B)(1{bin}*)?[.]((0*1+{bin}*)|0)										     	{++tokencount; printf("Line %d --> Bin_FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.dval = bintoReal(yytext);printf("TOKEN literal value: %.2lf\n", bintoReal(yytext));return(T_FCONST);}
 ([1-9]{digit}*)?[.]((0*[1-9]+{digit}*)|0)					                    {++tokencount; printf("Line %d --> FCONST: %s | TOKEN #%d\n", linecount, yytext, tokencount);yylval.dval = dectoReal(yytext);printf("TOKEN literal value: %.2lf\n", dectoReal(yytext));return(T_FCONST);}
 
  /* Integers */
@@ -131,7 +138,7 @@ whitespace                                                                      
 "("                                                                             {++tokencount; printf("Line %d --> TOKEN LPAREN: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_LPAREN);}
 ")"                                                                             {++tokencount; printf("Line %d --> TOKEN RPAREN: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_RPAREN);}
 ";"                                                                             {++tokencount; printf("Line %d --> TOKEN SEMI: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_SEMI);}
-"."                                                                             {++tokencount; printf("Line %d --> TOKEN COLON: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_COLON);}
+"."                                                                             {++tokencount; printf("Line %d --> TOKEN COLON: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_DOT);}
 ","                                                                             {++tokencount; printf("Line %d --> TOKEN COMMA: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_COMMA);}
 "="                                                                             {++tokencount; printf("Line %d --> TOKEN ASSIGN: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_ASSIGN);}
 "::"                                                                            {++tokencount; printf("Line %d --> TOKEN METH: %s | TOKEN #%d\n", linecount, yytext, tokencount);return(T_METH);}
@@ -158,22 +165,22 @@ whitespace                                                                      
 
  /* SCONST */;
 \"                                                                              {BEGIN(STRING); buffer_ptr = buffer;}
-<STRING>\"                                                                      {BEGIN(INITIAL); *buffer_ptr = '\0'; ++tokencount; printf("Line %d --> TOKEN SCONST: %s | TOKEN #%d\n", linecount, buffer, tokencount);yylval.strval = strdup(buffer); return(T_SCONST);}
+<STRING>\"                                                                      {BEGIN(INITIAL); *buffer_ptr = '\0'; ++tokencount; printf("Line %d --> TOKEN SCONST: %s | TOKEN #%d\n", linecount, buffer, tokencount); yylval.strval = strdup(buffer); return(T_SCONST);}
 <STRING>\n                                                                      {yyerror("fatal error: illegal linefeed in string");yyterminate();}
-<STRING>\\n                                                                     {*buffer_ptr = '\n'; *buffer_ptr++;}
-<STRING>\\f                                                                     {*buffer_ptr = '\f'; *buffer_ptr++;}
-<STRING>\\t                                                                     {*buffer_ptr = '\t'; *buffer_ptr++;}
-<STRING>\\r                                                                     {*buffer_ptr = '\r'; *buffer_ptr++;}
-<STRING>\\b                                                                     {*buffer_ptr = '\b'; *buffer_ptr++;}
-<STRING>\\v                                                                     {*buffer_ptr = '\v'; *buffer_ptr++;}
-<STRING>\\\\                                                                    {*buffer_ptr = '\\'; *buffer_ptr++;}
-<STRING>\\\"                                                                    {*buffer_ptr = '"'; *buffer_ptr++;}
+<STRING>\\n                                                                     {*buffer_ptr++ = '\n'; /* *buffer_ptr++; */}
+<STRING>\\f                                                                     {*buffer_ptr++ = '\f'; /* *buffer_ptr++; */}
+<STRING>\\t                                                                     {*buffer_ptr++ = '\t'; /* *buffer_ptr++; */}
+<STRING>\\r                                                                     {*buffer_ptr++ = '\r'; /* *buffer_ptr++; */}
+<STRING>\\b                                                                     {*buffer_ptr++ = '\b'; /* *buffer_ptr++; */}
+<STRING>\\v                                                                     {*buffer_ptr++ = '\v'; /* *buffer_ptr++; */}
+<STRING>\\\\                                                                    {*buffer_ptr++ = '\\'; /* *buffer_ptr++; */}
+<STRING>\\\"                                                                    {*buffer_ptr++ = '"'; /* *buffer_ptr++; */}
 <STRING>\\\n                                                                    {linecount++;}
-<STRING>\\{alnum}?                                                              {*buffer_ptr = yytext[1]; *buffer_ptr++;}
-<STRING>.                                                                       {char *token_index = yytext; while (*token_index){ *buffer_ptr = *token_index; *buffer_ptr++; *token_index++;}}
+<STRING>\\({alnum}|_)?                                                          {*buffer_ptr++ = yytext[1]; /* *buffer_ptr++; */}
+<STRING>[^\\\n\"]+                                                              {char *token_index = yytext; while (*token_index){ *buffer_ptr++ = *token_index++; /* *buffer_ptr++; *token_index++; */ }}
 <STRING><<EOF>>                                                                 {error_distinction = 0; yyerror("fatal error: missing \"\t");yyterminate();}
 
-<<EOF>>										                                    {printf("\n\033[1;33mAnalyzer Finished! \033[0m\n");return(T_EOF);}
+<<EOF>>										                                    {return(T_EOF);}
 {whitespace}*                                                                   {}
 \n										                                        {++linecount;}
 .                                                                               {error_distinction = 1; yyerror("Invalid token"); yyless(1); /*since we want to reenter the token, without the character who is causing the error*/}

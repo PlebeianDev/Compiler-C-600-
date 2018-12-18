@@ -68,11 +68,11 @@
 #define STR_BUF		  256
 
 #define YYTYPE_IS_DECLARED
-typedef union{
-	const char* strval;
-	int ival;
-	double dval;
-}YYSTYPE;
+// typedef union{
+// 	const char* strval;
+// 	int ival;
+// 	double dval;
+// }YYSTYPE;
 
 void yyerror (char *s, int error_distinction);
 int dectoInt(char *s);
